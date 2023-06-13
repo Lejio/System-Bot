@@ -41,6 +41,17 @@ class Roles(commands.Cog):
         super().__init__()
         self.gameRoles = {"COC":None, "LOL":None, "CS:GO":None, "OW":None}
         
+    
+    def is_guild_admin(self):
+        """
+            Determines if the current ctx is the guild owner and/or bot owner.
+        """
+
+        def predicate(ctx):
+            return ctx.guild is not None and ctx.guild.owner_id == ctx.author.id
+
+        return commands.check(predicate)
+        
         
     @app_commands.command(name="buttontest", description="Button Embed Testing")
     async def buttonTest(self, interaction: discord.Interaction):
@@ -94,9 +105,17 @@ class Roles(commands.Cog):
     async def createrole(self, interaction: discord.Interaction, name: str, colors: discord.app_commands.Choice[int], reason:str):
         
         await interaction.guild.create_role(name=name, colour=discord.Colour(colors.value), reason=reason)
-        
         await interaction.response.send_message(f"Created new role: {name}")
         
+    
+    # @app_commands.command(name="removerole", description="Removes a role.")
+    # @app_commands
+    
+    @app_commands.command(name="checkpermissions", description="Checks your social status.")
+    @commands.has_permissions(is_guild_admin())
+    async def checkSocialStatus(self, interaction: discord.Interaction):
+        
+        await interaction.response.send_message("You are indeed an admin!")
         
         
 async def setup(bot):
