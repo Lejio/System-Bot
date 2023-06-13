@@ -7,7 +7,7 @@ from discord.interactions import Interaction
 from discord.partial_emoji import PartialEmoji
 from discord.ui import Button, View
 
-from roleEnum import GAMINGROLE
+from roleEnum import GAMINGROLE, COLORS
 from roleDbConnector import RoleDatabase
 
 class RoleButton(discord.ui.Button):
@@ -85,12 +85,15 @@ class Roles(commands.Cog):
         await interaction.response.send_message(f"Role database updated successfully.")
         
     
+    # color.name for color in COLORS
     # https://discordpy.readthedocs.io/en/stable/api.html?highlight=create_role#discord.Guild.create_role
     @app_commands.command(name="createrole", description="Creates a role based on given parameters.")
+    @app_commands.describe(colors="Color selector")
+    @app_commands.choices(colors=[discord.app_commands.Choice(name=color.name, value=color.value) for color in COLORS])
     @commands.check_any(commands.is_owner())
-    async def createrole(self, interaction: discord.Interaction, name: str, reason: str = None):
+    async def createrole(self, interaction: discord.Interaction, name: str, colors: discord.app_commands.Choice[int], reason:str):
         
-        await interaction.guild.create_role(name=name, colour=discord.Colour.dark_magenta(), reason=reason)
+        await interaction.guild.create_role(name=name, colour=discord.Colour(colors.value), reason=reason)
         
         await interaction.response.send_message(f"Created new role: {name}")
         

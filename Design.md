@@ -11,6 +11,8 @@ Planned features:
 2. How often they participate in events.
 3. Tokens and Coins. Both obtained through leveling up and playing games.
 
+
+
 # Other features:
 1. Collaboration with GangBang the First to implement chat-GPT and DALL-E
 2. Pokemon Game
@@ -75,5 +77,8 @@ Coins could then be used in the PokeMart to buy pokeballs to catch more pokemon,
 TOKENS are NOT crytocurrencies. The prices are set by what you could trade them for.
 
 1 TOKEN --> 1 CHAT-GPT-3.5-TURBO Question
+
+
+
 
 
