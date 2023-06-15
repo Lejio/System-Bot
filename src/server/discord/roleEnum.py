@@ -3,10 +3,11 @@ from discord.colour import Colour
 
 class Game:
     
-    def __init__(self, name: str, role_id: int) -> None:
+    def __init__(self, name: str, role_id: int, emoji_id: str) -> None:
         
         self.name = name
         self.role_id = role_id
+        self.emoji_id = emoji_id
         
 
 class SocialStatus():
@@ -53,10 +54,16 @@ class ROLE(Enum):
 
 class GAMINGROLE(Enum):
     
-    COC = Game("Clash of Clans", 0)
-    LOL = Game("League of Legends", 0)
-    CSGO = Game("Counter Strike: Global Offensive", 0)
-    OW = Game("Overwatch", 0)
-    MC = Game("Minecraft", 0)
+    COC = Game("Clash of Clans", None, "<:clashofclanslogo:1118576713731952710>")
+    LOL = Game("League of Legends", None, "<:leagueoflegendslogo:1118578542658203758>")
+    CSGO = Game("Counter Strike: Global Offensive", None, "<:csgologo:1118574508740198430>")
+    OW = Game("Overwatch", None, "<:owlogo:1118576782162018304>")
+    MC = Game("Minecraft", None, "<:minecraftlogo:1118578499599487057>")
+    AL = Game("Apex Legends", None, "<:apexlegendslogo:1118576697269293187>")
+    PH = Game("Phasmophobia", None, "<:phasmophobialogo:1118576806203752630>")
+    VL = Game("Valorant", None, "<:valorantlogo:1118576824071487538>")
+    PZ = Game("Project Zomboid", None, "<:projectzomboidlogo:1118675430749241434>")
+    CODWZ = Game("Call of Duty: Warzone", None, "<:codwarzonelogo:1118675402584498237>")
+    TR = Game("Terraria", None, "<:terrarialogo:1118676660875706408>")
     
     
