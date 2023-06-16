@@ -1,6 +1,7 @@
 import json
 from os import path
-from typing import Any
+
+from discord import Guild, Colour
 
 """
     Incomplete. next step is to generate server profiles.
@@ -10,7 +11,9 @@ from typing import Any
 """
 class GuildRoles:
     
-    def __init__(self) -> None:
+    def __init__(self, guild: Guild) -> None:
+        
+        self.guild = guild
         
         if path.isfile("Roles/guildRoles.json") is False:
             raise Exception("File not found")
@@ -31,17 +34,16 @@ class GuildRoles:
 
         with open("Roles/default.json") as fp:
             self.__roleObj = json.load(fp)
-        
-        
+            
         self.__guildroles = self.__roleObj
         
         with open("Roles/guildRoles.json", 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
-    def createRole(self, name: str, role_id: int = None, emoji_id: str = None) -> None:
+    def createRole(self, name: str, role_id: int = None, emoji_id: str = None, colour: str = Colour.random()) -> None:
         
-        self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id}
+        self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id, 'colour': colour}
         
         with open("Roles/guildRoles.json", 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
@@ -66,7 +68,7 @@ class GuildRoles:
         Raises:
             Exception: If category other than role_id/emoji_id is inputted, exception is raised.
         """
-        if not (["role_id", "emoji_id"].__contains__(category)):
+        if not (["role_id", "emoji_id", "colour"].__contains__(category)):
             
             raise Exception("Category not supported.")
             
@@ -76,7 +78,7 @@ class GuildRoles:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
-    def getGuildRoles(self):
+    def getGuildRoles(self) -> dict:
         
         return self.__guildroles
             
@@ -87,7 +89,3 @@ class GuildRoles:
     
     def __str__(self) -> str:
         return str(self.__guildroles)
-        
-        
-    
-    

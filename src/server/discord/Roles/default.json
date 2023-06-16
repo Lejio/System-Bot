@@ -1,46 +1,57 @@
 {
     "Clash of Clans": {
       "role_id": null,
-      "emoji_id": "<:clashofclanslogo:1118576713731952710>"
+      "emoji_id": "<:clashofclanslogo:1118576713731952710>",
+      "colour": "0xA84300"
     },
     "League of Legends": {
-        "role_id": null,
-        "emoji_id": "<:leagueoflegendslogo:1118578542658203758>"
+      "role_id": null,
+      "emoji_id": "<:leagueoflegendslogo:1118578542658203758>",
+      "colour": "0x3498DB"
     },
     "Counter Strike: Global Offensive": {
-        "role_id": null,
-        "emoji_id": "<:csgologo:1118574508740198430>"
+      "role_id": null,
+      "emoji_id": "<:csgologo:1118574508740198430>",
+      "colour": "0x206694"
     },
     "Overwatch": {
-        "role_id": null,
-        "emoji_id": "<:owlogo:1118576782162018304>"
+      "role_id": null,
+      "emoji_id": "<:owlogo:1118576782162018304>",
+      "colour": "0xC27C0E"
     },
     "Minecraft": {
-        "role_id": null,
-        "emoji_id": "<:minecraftlogo:1118578499599487057>"
+      "role_id": null,
+      "emoji_id": "<:minecraftlogo:1118578499599487057>",
+      "colour": "0x1F8B4C"
     },
     "Apex Legends": {
-        "role_id": null,
-        "emoji_id": "<:apexlegendslogo:1118576697269293187>"
+      "role_id": null,
+      "emoji_id": "<:apexlegendslogo:1118576697269293187>",
+      "colour": "0x992D22"
     },
     "Phasmophobia": {
-        "role_id": null,
-        "emoji_id": "<:phasmophobialogo:1118576806203752630>"
+      "role_id": null,
+      "emoji_id": "<:phasmophobialogo:1118576806203752630>",
+      "colour": "0x313338"
     },
     "Valorant": {
-        "role_id": null,
-        "emoji_id": "<:valorantlogo:1118576824071487538>"
+      "role_id": null,
+      "emoji_id": "<:valorantlogo:1118576824071487538>",
+      "colour": "0xEB459E"
     },
     "Project Zomboid": {
-        "role_id": null,
-        "emoji_id": "<:projectzomboidlogo:1118675430749241434>"
+      "role_id": null,
+      "emoji_id": "<:projectzomboidlogo:1118675430749241434>",
+      "colour": "0x546E7A"
     },
     "Call of Duty: Warzone": {
-        "role_id": null,
-        "emoji_id": "<:codwarzonelogo:1118675402584498237>"
+      "role_id": null,
+      "emoji_id": "<:codwarzonelogo:1118675402584498237>",
+      "colour": "0x71368A"
     },
     "Terraria": {
-        "role_id": null,
-        "emoji_id": "<:terrarialogo:1118676660875706408>"
+      "role_id": null,
+      "emoji_id": "<:terrarialogo:1118676660875706408>",
+      "colour": "0x11806A"
     }
 }

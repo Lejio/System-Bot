@@ -1,5 +1,5 @@
 from discord.ui import Button
-from discord import Guild, ButtonStyle, Interaction, app_commands
+from discord import Guild, ButtonStyle, Interaction, app_commands, Colour, utils
 from discord.ui import View
 from discord.ext import commands
 
@@ -11,7 +11,6 @@ class RoleButton(Button):
         
         
         super().__init__(style=ButtonStyle.secondary, emoji=emoji)
-        self.label = guild.get_role(role_id)
         self.role = guild.get_role(role_id)
         self.role_id = role_id
         self.guild = guild
@@ -35,8 +34,8 @@ class Role(commands.Cog):
         super().__init__()
         
     
-
     @app_commands.command(name="choose", description="Button Embed Testing")
+    @app_commands.default_permissions(administrator=True)
     async def buttonTest(self, interaction: Interaction):
         """
         Button testing command. Sys bot displays one button. Upon user clicking on the button, the bot responds with a message.
@@ -48,24 +47,38 @@ class Role(commands.Cog):
         # Creates a Discord View object.
         testView = View()
         
-        guildroles = GuildRoles()
-        guildroles = guildroles.getGuildRoles()
+        guildroles = GuildRoles(interaction.guild)
+        await self.initRoles(interaction.guild, guildroles)
         
-        # print(type(guildroles))
-        # print(guildroles)
         
-        for i in guildroles:
+        
+        for i in guildroles.getGuildRoles():
 
-            testView.add_item(RoleButton(guildroles[i]['role_id'], interaction.guild, guildroles[i]['emoji_id']))
-
-        
-        # Connects the created callback function to the testButton.
-        # testButton.callback = callBackTest
-        
+            testView.add_item(RoleButton(guildroles.getGuildRoles()[i]['role_id'], interaction.guild, guildroles.getGuildRoles()[i]['emoji_id']))
         
         # Sends view as interaction.
         await interaction.response.send_message(view=testView)
+        
+    @app_commands.command(name="remove-all-roles", description="REMOVES ALL ROLES")
+    @app_commands.default_permissions(administrator=True)
+    async def removeallroles(self, interaction: Interaction):
+        
+        roles = interaction.guild.roles
+        
+        await interaction.response.send_message("Deleted all roles.")
+        
+        for r in roles:
+            if r != interaction.guild.default_role and not r.permissions.administrator:
+                await r.delete()
+        
+        
     
+    async def initRoles(self, guild: Guild, guildRoles: GuildRoles):
+        for r in guildRoles.getGuildRoles():
+            # print(r)
+            await guild.create_role(name=r, colour=Colour.from_str(guildRoles.getGuildRoles()[r]["colour"]), reason="SYS INITIAL ROLE")
+            guildRoles.editRole(name=r, category="role_id", newVal=str(utils.get(guild.roles, name=r).id))
+            
 
 
 async def setup(bot: commands.Bot):
