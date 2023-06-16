@@ -42,9 +42,10 @@ pydevd*.log
 nodeLanguageServer/**
 nodeLanguageServer.*/**
 dist/**
+**/database
+guildRoles.json
 # translation files
 *.xlf
 package.nls.*.json
 l10n/
 .env
-**/database

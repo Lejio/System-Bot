@@ -1,0 +1,46 @@
+{
+    "Clash of Clans": {
+      "role_id": null,
+      "emoji_id": "<:clashofclanslogo:1118576713731952710>"
+    },
+    "League of Legends": {
+        "role_id": null,
+        "emoji_id": "<:leagueoflegendslogo:1118578542658203758>"
+    },
+    "Counter Strike: Global Offensive": {
+        "role_id": null,
+        "emoji_id": "<:csgologo:1118574508740198430>"
+    },
+    "Overwatch": {
+        "role_id": null,
+        "emoji_id": "<:owlogo:1118576782162018304>"
+    },
+    "Minecraft": {
+        "role_id": null,
+        "emoji_id": "<:minecraftlogo:1118578499599487057>"
+    },
+    "Apex Legends": {
+        "role_id": null,
+        "emoji_id": "<:apexlegendslogo:1118576697269293187>"
+    },
+    "Phasmophobia": {
+        "role_id": null,
+        "emoji_id": "<:phasmophobialogo:1118576806203752630>"
+    },
+    "Valorant": {
+        "role_id": null,
+        "emoji_id": "<:valorantlogo:1118576824071487538>"
+    },
+    "Project Zomboid": {
+        "role_id": null,
+        "emoji_id": "<:projectzomboidlogo:1118675430749241434>"
+    },
+    "Call of Duty: Warzone": {
+        "role_id": null,
+        "emoji_id": "<:codwarzonelogo:1118675402584498237>"
+    },
+    "Terraria": {
+        "role_id": null,
+        "emoji_id": "<:terrarialogo:1118676660875706408>"
+    }
+}

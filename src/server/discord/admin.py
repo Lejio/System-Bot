@@ -11,7 +11,6 @@ class Admin(commands.GroupCog):
     
     def __init__(self, bot: commands.Bot) -> None:
         super().__init__()
-        # self.__cog_name__("role-command")
 
     
     @app_commands.command(name="backup_role_database", description="Programming purposes.")
@@ -29,16 +28,10 @@ class Admin(commands.GroupCog):
         await interaction.response.send_message(f"Role database updated successfully.")
         
     
-    # color.name for color in COLORS
     # https://discordpy.readthedocs.io/en/stable/api.html?highlight=create_role#discord.Guild.create_role
     @app_commands.command(name="role-create", description="Creates a role based on given parameters.")
     @app_commands.describe(colors="Color selector")
-    @app_commands.choices(colors=[discord.app_commands.Choice(name=color.name, value=color.value) for color in COLORS])
-    
-    # Default permissions mean only admins can access these commands.
-    @app_commands.default_permissions(manage_roles=True, manage_permissions=True)
-    
-    # @app_commands.default_permissions(ban_members=True) Add the permission names and bool as  values to include access.
+    @app_commands.choices(colors=[discord.app_commands.Choice(name=color.name, value=color.value) for color in COLORS])    
     async def createrole(self, interaction: discord.Interaction, name: str, colors: discord.app_commands.Choice[int], reason:str):
         
         await interaction.guild.create_role(name=name, colour=discord.Colour(colors.value), reason=reason)
@@ -47,7 +40,6 @@ class Admin(commands.GroupCog):
     
     
     @app_commands.command(name="role-remove", description="Removes a Role.")
-    @app_commands.default_permissions(manage_roles=True, manage_permissions=True)
     async def checkSocialStatus(self, interaction: discord.Interaction, role: discord.Role, reason: str = None):
         
         await role.delete(reason=reason)
@@ -55,7 +47,6 @@ class Admin(commands.GroupCog):
         
     
     @app_commands.command(name="testcommand", description="Test")
-    @app_commands.default_permissions(administrator=True)
     async def test(self, interaction: discord.Interaction):
         
         # print(discord.Permissions._has_flag(discord.Permissions.manage_permissions))
