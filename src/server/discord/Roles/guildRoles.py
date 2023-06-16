@@ -1,5 +1,6 @@
 import json
 from os import path
+from typing import Any
 
 """
     Incomplete. next step is to generate server profiles.
@@ -11,10 +12,10 @@ class GuildRoles:
     
     def __init__(self) -> None:
         
-        if path.isfile("guildRoles.json") is False:
+        if path.isfile("Roles/guildRoles.json") is False:
             raise Exception("File not found")
         
-        with open("guildRoles.json") as fp:
+        with open("Roles/guildRoles.json") as fp:
             self.__guildroles = json.load(fp)
         
         
@@ -24,17 +25,17 @@ class GuildRoles:
     
     def initRoles(self):
         
-        if path.isfile("default.json") is False:
+        if path.isfile("Roles/default.json") is False:
             raise Exception("File not found")
         
 
-        with open("default.json") as fp:
+        with open("Roles/default.json") as fp:
             self.__roleObj = json.load(fp)
         
         
         self.__guildroles = self.__roleObj
         
-        with open("guildRoles.json", 'w') as json_file:
+        with open("Roles/guildRoles.json", 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
@@ -42,7 +43,7 @@ class GuildRoles:
         
         self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id}
         
-        with open("guildRoles.json", 'w') as json_file:
+        with open("Roles/guildRoles.json", 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
@@ -50,7 +51,7 @@ class GuildRoles:
         
         del self.__guildroles[name]
         
-        with open("guildRoles.json", 'w') as json_file:
+        with open("Roles/guildRoles.json", 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
             
@@ -71,8 +72,13 @@ class GuildRoles:
             
         self.__guildroles[name][category] = newVal
         
-        with open("guildRoles.json", 'w') as json_file:
+        with open("Roles/guildRoles.json", 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+            
+    
+    def getGuildRoles(self):
+        
+        return self.__guildroles
             
     
     def __sizeof__(self) -> int:

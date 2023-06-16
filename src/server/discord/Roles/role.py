@@ -3,6 +3,8 @@ from discord import Guild, ButtonStyle, Interaction, app_commands
 from discord.ui import View
 from discord.ext import commands
 
+from Roles.guildRoles import GuildRoles
+
 class RoleButton(Button):
     
     def __init__(self, role_id: int, guild: Guild, emoji: str = None):
@@ -46,14 +48,20 @@ class Role(commands.Cog):
         # Creates a Discord View object.
         testView = View()
         
-        # Creates a button.
-        testButton = RoleButton(925962416272052275, interaction.guild, "<:emoji_39:935315265468633148>")
+        guildroles = GuildRoles()
+        guildroles = guildroles.getGuildRoles()
+        
+        # print(type(guildroles))
+        # print(guildroles)
+        
+        for i in guildroles:
+
+            testView.add_item(RoleButton(guildroles[i]['role_id'], interaction.guild, guildroles[i]['emoji_id']))
+
         
         # Connects the created callback function to the testButton.
         # testButton.callback = callBackTest
         
-        # Adds the button to the view.
-        testView.add_item(testButton)
         
         # Sends view as interaction.
         await interaction.response.send_message(view=testView)

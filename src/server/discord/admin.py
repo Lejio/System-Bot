@@ -55,14 +55,7 @@ class Admin(commands.GroupCog):
                 await interaction.response.send_message(f"Created new role: {name}")
                 
             else:
-                await interaction.response.send_message("You need to choose a color!")    
-        
-        
-    # async def createrole(self, interaction: discord.Interaction, name: str, reg_color: discord.app_commands.Choice[int], reason:str):
-    #     await interaction.guild.create_role(name=name, colour=discord.Colour(reg_color.value), reason=reason)
-    #     await interaction.response.send_message(f"Created new role: {name}")
-        
-            
+                await interaction.response.send_message("You need to choose a color!")        
         
     
     
