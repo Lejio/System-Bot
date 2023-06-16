@@ -3,10 +3,6 @@ from discord import Guild, ButtonStyle, Interaction, app_commands
 from discord.ui import View
 from discord.ext import commands
 
-from roleEnum import GAMINGROLE, COLORS
-from roleDbConnector import RoleDatabase
-
-
 class RoleButton(Button):
     
     def __init__(self, role_id: int, guild: Guild, emoji: str = None):
@@ -64,4 +60,5 @@ class Role(commands.Cog):
     
 
 
-    
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Role())

@@ -21,7 +21,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 client = commands.Bot(command_prefix="!sys ", intents=discord.Intents.all())
-cogs: list = ["Roles.role"]
+cogs: list = ["Roles.role", "admin"]
 load_dotenv()
 
 embed = None
