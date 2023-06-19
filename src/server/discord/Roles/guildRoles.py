@@ -10,64 +10,98 @@ from discord import Guild, Colour
     
 """
 class GuildRoles:
+    """Manages the roles of a given guild.
+    """
     
     
     def __init__(self, guild: Guild) -> None:
+        """Manages and stores the roles of a given guild. Must have guild profile already setup. Stores guild information in roles.json in the guild profile. Creates a role database if one is not exist in a exisiting guild profile. Default roles will be implemented.
+
+        Args:
+            guild (Guild): Guild that needed to be edited.
+
+        Raises:
+            Exception: Guild default template not found (file missing).
+        """
         
         self.guild = guild
+        self.DATABASE_NAME = guild.id
+        self.DEFAULT_TEMPLATE_PATH = "Roles/default.json"
+        self.DATABASE_PATH = f"../../database/{self.DATABASE_NAME}/roles.json"
         
-        if path.isfile("Roles/guildRoles.json") is False:
-            raise Exception("File not found")
-        
-        with open("Roles/guildRoles.json") as fp:
-            self.__guildroles = json.load(fp)
-        
-        
-        if self.__sizeof__() == 0:
-            self.initRoles()
-    
-    
-    def initRoles(self):
-        
-        if path.isfile("Roles/default.json") is False:
+        if path.isfile(self.DEFAULT_TEMPLATE_PATH) is False:
             raise Exception("File not found")
         
 
-        with open("Roles/default.json") as fp:
+        
+        
+        if self.__sizeof__() == 0:
+            self.__initRoles()
+        else:
+            with open(self.DATABASE_PATH) as fp:
+                self.__guildroles = json.load(fp)
+    
+    
+    def __initRoles(self) -> None:
+        """Role profile initializer. Must have guild profile setup already before initializing GuildRoles.
+
+        Raises:
+            Exception: If file is not found, throws an exception.
+        """
+        
+        if path.isfile(self.DEFAULT_TEMPLATE_PATH) is False:
+            raise Exception("File not found")
+        
+
+        with open(self.DEFAULT_TEMPLATE_PATH) as fp:
             self.__roleObj = json.load(fp)
             
         self.__guildroles = self.__roleObj
         
-        with open("Roles/guildRoles.json", 'w') as json_file:
+        with open(self.DATABASE_PATH , 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
     def createRole(self, name: str, role_id: int = None, emoji_id: str = None, colour: str = Colour.random()) -> None:
+        """Creates a role. Default none-types must be checked.
+
+        Args:
+            name (str): Name of the role.
+            role_id (int, optional): Role id that is connected to discord.Role. Defaults to None.
+            emoji_id (str, optional): Emoji that is related to the role. Defaults to None.
+            colour (str, optional): The color of the role. Gives random color if none is given. Defaults to Colour.random().
+        """
         
         self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id, 'colour': colour}
         
-        with open("Roles/guildRoles.json", 'w') as json_file:
+        with open(self.DEFAULT_TEMPLATE_PATH, 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
-    def removeRole(self, name: str):
-        
+    def removeRole(self, name: str) -> True:
+        """Removes a role. Always returns true. There are no checks. Exceptions could be thrown when retrieving roles if not handled correctly.
+
+        Args:
+            name (str): Role name.
+        """
         del self.__guildroles[name]
         
-        with open("Roles/guildRoles.json", 'w') as json_file:
+        with open(self.DATABASE_PATH , 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
+        return True
             
-    def editRole(self, name: str, category: str, newVal):
+            
+    def editRole(self, name: str, category: str, newVal) -> None:
         """Edit existing role_id or emoji_id values of a exisiting role.
 
         Args:
             name (str): Name of role.
             category (str): role_id or emoji_id.
-            newVal (_type_): New value you wish to input.
+            newVal (_type_): New value you wish to input. No checks on correct values performed.
 
         Raises:
-            Exception: If category other than role_id/emoji_id is inputted, exception is raised.
+            Exception: If category other than role_id/emoji_id/colour is inputted, exception is raised.
         """
         if not (["role_id", "emoji_id", "colour"].__contains__(category)):
             
@@ -75,14 +109,19 @@ class GuildRoles:
             
         self.__guildroles[name][category] = newVal
         
-        with open("Roles/guildRoles.json", 'w') as json_file:
+        with open(self.DATABASE_PATH , 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
     def getGuildRoles(self) -> dict:
+        """Returns the guild roles as a two dimensional dictionary.
+
+        Returns:
+            dict: Current roles and its properties.
+        """
         
         return self.__guildroles
-            
+
     
     def __sizeof__(self) -> int:
         return len(self.__guildroles)

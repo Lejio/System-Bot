@@ -2,7 +2,6 @@ import os
 import sqlite3
 
 from discord import Member, Guild
-import discord
 
 class GuildDatabase:
     
@@ -22,23 +21,21 @@ class GuildDatabase:
             
         else:
             
-            self.conn = sqlite3.connect(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.DATABASE_NAME}")
-            self.cursor = self.conn.cursor()
+            self.__conn = sqlite3.connect(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.DATABASE_NAME}")
+            self.__cursor = self.__conn.cursor()
+            print(f"{self.DIR_NAME} Connection Stable.")
             
 
     
-    def check_dir(self):
-        """
-        Checks if the database id has a file with the same name.
-        return:
-        True - If the database exists
-        False - If the database doesn't exits.
+    def check_dir(self) -> bool:
+        """Checks if the database id has a file with the same name.
+
+        Returns:
+            bool: Database exists or not.
         """
 
         db_list = os.listdir(self.DATABASE_PATH + "/")
         
-        print(db_list)
-
         for db in db_list:
 
             if str(self.DIR_NAME) in db:
@@ -52,10 +49,10 @@ class GuildDatabase:
         
         os.mkdir(self.DATABASE_PATH + "/" + self.DIR_NAME)
         
-        self.conn = sqlite3.connect(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.DATABASE_NAME}")
-        self.cursor = self.conn.cursor()
+        self.__conn = sqlite3.connect(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.DATABASE_NAME}")
+        self.__cursor = self.__conn.cursor()
         
-        self.conn.execute('''CREATE TABLE MEMBERS 
+        self.__conn.execute('''CREATE TABLE MEMBERS 
         (MEMBER_ID INTEGER NOT NULL,
         DISPLAY_NAME TEXT NOT NULL,
         ROLE_ID INTEGER NOT NULL
@@ -63,24 +60,26 @@ class GuildDatabase:
         
 
         
-    def add_member(self, member: Member):
+    def add_member(self, member: Member) -> bool:
         
         try:
             
-            self.conn.execute(f"INSERT INTO MEMBERS (MEMBER_ID, DISPLAY_NAME, ROLE_ID) VALUES ('{member.id}', '{member.display_name}', '{member.top_role}');")
+            self.__conn.execute(f"INSERT INTO MEMBERS (MEMBER_ID, DISPLAY_NAME, ROLE_ID) VALUES ('{member.id}', '{member.display_name}', '{member.top_role}');")
+            self.__conn.commit()
+            return True
             
         except Exception as e:
             
             print(member.name)
             print(e)
-        
-        self.conn.commit()
+            return False
         
     
     def get_info_for(self, member: Member):
         
-        self.cursor.execute(f"SELECT * FROM MEMBERS WHERE MEMBER_ID = {member.id}")
-        return self.cursor.fetchone()
+        self.__cursor.execute(f"SELECT * FROM MEMBERS WHERE MEMBER_ID = {member.id}")
+        return self.__cursor.fetchone()
+    
     
     def deleteDB(self) -> bool:
         
@@ -94,6 +93,7 @@ class GuildDatabase:
         try:
             print("Removing database..")
             os.rmdir(self.DATABASE_PATH + "/" + self.DIR_NAME)
+            print(f"{self.DIR_NAME} Removed.")
             return True
         except Exception as e:
             print(e)
@@ -102,5 +102,5 @@ class GuildDatabase:
     
     def close(self):
         
-        self.conn.close()
+        self.__conn.close()
         

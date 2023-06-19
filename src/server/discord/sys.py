@@ -16,9 +16,15 @@
 import os
 from datetime import datetime
 
+
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+import tracemalloc
+
+
+from Roles.connector import GuildDatabase
+from Roles.guildRoles import GuildRoles
 
 client = commands.Bot(command_prefix="!sys ", intents=discord.Intents.all())
 cogs: list = ["Roles.role", "admin"]
@@ -29,34 +35,40 @@ embed = None
 
 @client.event
 async def on_ready():
-    """
-    Client event. Runs when the bot is ready and has successfully logged in.
-    """
+  """
+  Client event. Runs when the bot is ready and has successfully logged in.
+  """
+  tracemalloc.start()
 
-    print(f"\n{datetime.utcnow()}: Logged in successfully as: " + str(client.user) + "\n")
+  print(f"\n{datetime.utcnow()}: Logged in successfully as: " + str(client.user) + "\n")
 
-    try:
-      
-      for cog in cogs:  # Loads each config into the client.
-        # try:
-
-        await client.load_extension(cog)
-        print(f"Loaded cog {cog}")
-
-      print("Successfully loaded all Cogs\n")
-      
-    except commands.ExtensionAlreadyLoaded:
-      
-      print("Extension already loaded")
+  try:
     
-    synced = await client.tree.sync()
-    print(f"Synced {len(synced)} commands.")
+    for cog in cogs:  # Loads each config into the client.
+
+      await client.load_extension(cog)
+      print(f"Loaded cog {cog}")
+
+    print("Successfully loaded all Cogs\n")
+    
+  except commands.ExtensionAlreadyLoaded:
+    
+    print("Extension already loaded")
+  
+  synced = await client.tree.sync()
+  print(f"Synced {len(synced)} commands.")
+    
+@client.event
+async def on_guild_join(guild: discord.Guild):
+
+  guildprofile = GuildDatabase(guild=guild)
+    
     
 
 @client.event
 async def on_member_join(member):
-    role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
-    await member.add_roles(role)
+  role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
+  await member.add_roles(role)
 
 
 @client.tree.command(name="hello", description="A hello echoer.")
@@ -116,8 +128,23 @@ async def initSetup(ctx):
   await ctx.send("Initializing bot setup phase.")
 
 
+@client.command("status")
+@commands.check_any(commands.is_owner())
+async def statusbot(ctx):
+  a, b = tracemalloc.get_traced_memory()
+  print("Current Memory [KB]: " + str(round(a/1024)))
+  print("Peak Memory [KB]: " + str(round(b/1024)))
   
   
+  
+
+@client.command("kill")
+@commands.check_any(commands.is_owner())
+async def killbot(ctx):
+  
+  tracemalloc.stop()
+  
+  await exit()
   
 
 
