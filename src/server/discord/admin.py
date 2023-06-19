@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from roleEnum import REG_COLORS, DARK_COLORS, LIGHT_COLORS
+from Roles.guildRoles import GuildRoles
 from roleDbConnector import RoleDatabase
 
 # Class decorator. Since GroupCog is the parent, then the permissions of the parent override its children.
@@ -12,6 +13,7 @@ class Admin(commands.GroupCog):
     def __init__(self, bot: commands.Bot) -> None:
         super().__init__()
 
+        self.bot = bot;
     
     @app_commands.command(name="backup_role_database", description="Programming purposes.")
     async def extractroles(self, interaction: discord.Interaction, backup_db_name: str):
@@ -64,6 +66,8 @@ class Admin(commands.GroupCog):
         
         try:
             await role.delete(reason=reason)
+            guildroles = GuildRoles(interaction.guild)
+            guildroles.removeRole()
             await interaction.response.send_message(f"Removed role {role.name}")
             
         except discord.errors.HTTPException:
@@ -74,9 +78,7 @@ class Admin(commands.GroupCog):
     
     @app_commands.command(name="testcommand", description="Test")
     async def test(self, interaction: discord.Interaction):
-        
-        # print(discord.Permissions._has_flag(discord.Permissions.manage_permissions))
-        
+                
         await interaction.response.send_message("You can ban members!")
     
     
