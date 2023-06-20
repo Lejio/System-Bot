@@ -15,6 +15,7 @@
 '''
 import os
 from datetime import datetime
+from typing import Optional, Literal
 
 
 import discord
@@ -55,8 +56,8 @@ async def on_ready():
     
     print("Extension already loaded")
   
-  synced = await client.tree.sync()
-  print(f"Synced {len(synced)} commands.")
+  # synced = await client.tree.sync()
+  # print(f"Synced {len(synced)} commands.")
     
 @client.event
 async def on_guild_join(guild: discord.Guild):
@@ -69,6 +70,42 @@ async def on_guild_join(guild: discord.Guild):
 async def on_member_join(member):
   role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
   await member.add_roles(role)
+  
+
+# Credit to Umbra for this amazing sync command!
+# https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html
+@client.command()
+@commands.guild_only()
+@commands.is_owner()
+async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+    if not guilds:
+        if spec == "~":
+            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        elif spec == "*":
+            ctx.bot.tree.copy_global_to(guild=ctx.guild)
+            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+        elif spec == "^":
+            ctx.bot.tree.clear_commands(guild=ctx.guild)
+            await ctx.bot.tree.sync(guild=ctx.guild)
+            synced = []
+        else:
+            synced = await ctx.bot.tree.sync()
+
+        await ctx.send(
+            f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+        )
+        return
+
+    ret = 0
+    for guild in guilds:
+        try:
+            await ctx.bot.tree.sync(guild=guild)
+        except discord.HTTPException:
+            pass
+        else:
+            ret += 1
+
+    await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 
 @client.tree.command(name="hello", description="A hello echoer.")

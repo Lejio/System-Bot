@@ -3,9 +3,12 @@ from discord import Guild, ButtonStyle, Interaction, app_commands, Colour, utils
 from discord.ui import View
 from discord.ext import commands
 
+from Roles.connector import GuildDatabase
 from Roles.guildRoles import GuildRoles
 
+
 class RoleButton(Button):
+    
     
     def __init__(self, role_id: int, interaction: Interaction, emoji: str = None):
         
@@ -48,8 +51,9 @@ class Role(commands.Cog):
         # Creates a Discord View object.
         testView = View()
         
+        guilddatabase = GuildDatabase(interaction.guild)
         guildroles = GuildRoles(interaction.guild)
-        await self.initRoles(interaction.guild, guildroles)
+        # await self.initRoles(interaction.guild, guildroles)
         
         
         
@@ -60,7 +64,8 @@ class Role(commands.Cog):
         # Sends view as interaction.
         await interaction.response.send_message(view=testView)
         
-    @app_commands.command(name="remove-all-roles", description="REMOVES ALL ROLES")
+    
+    @app_commands.command(name="removeall", description="REMOVES ALL ROLES")
     @app_commands.default_permissions(administrator=True)
     async def removeallroles(self, interaction: Interaction):
         
@@ -72,7 +77,6 @@ class Role(commands.Cog):
             if r != interaction.guild.default_role and not r.permissions.administrator:
                 await r.delete()
         
-        
     
     async def initRoles(self, guild: Guild, guildRoles: GuildRoles):
         for r in guildRoles.getGuildRoles():
@@ -80,9 +84,10 @@ class Role(commands.Cog):
             await guild.create_role(name=r, colour=Colour.from_str(guildRoles.getGuildRoles()[r]["colour"]), reason="SYS INITIAL ROLE")
             guildRoles.editRole(name=r, category="role_id", newVal=str(utils.get(guild.roles, name=r).id))
             
+
     @app_commands.command(name="test-role", description="Test")
     @app_commands.default_permissions(administrator=True)
-    async def removeallroles(self, interaction: Interaction):
+    async def test_role(self, interaction: Interaction):
             
             await interaction.response.send_message(interaction.guild.get_role(1119443557724467252).name)
 

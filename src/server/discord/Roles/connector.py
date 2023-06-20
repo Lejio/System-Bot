@@ -37,7 +37,8 @@ class GuildDatabase:
         db_list = os.listdir(self.DATABASE_PATH + "/")
         
         for db in db_list:
-
+            
+            print(db)
             if str(self.DIR_NAME) in db:
 
                 return True
@@ -48,6 +49,7 @@ class GuildDatabase:
     def database_setup(self):
         
         os.mkdir(self.DATABASE_PATH + "/" + self.DIR_NAME)
+        open(self.DATABASE_PATH + "/" + self.DIR_NAME + "/roles.json")
         
         self.__conn = sqlite3.connect(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.DATABASE_NAME}")
         self.__cursor = self.__conn.cursor()

@@ -32,14 +32,11 @@ class GuildRoles:
         if path.isfile(self.DEFAULT_TEMPLATE_PATH) is False:
             raise Exception("File not found")
         
-
-        
+        with open(self.DATABASE_PATH) as fp:
+            self.__guildroles = json.load(fp)
         
         if self.__sizeof__() == 0:
             self.__initRoles()
-        else:
-            with open(self.DATABASE_PATH) as fp:
-                self.__guildroles = json.load(fp)
     
     
     def __initRoles(self) -> None:
