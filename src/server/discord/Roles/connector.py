@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import json
 
 from discord import Member, Guild
 
@@ -9,8 +10,9 @@ class GuildDatabase:
     def __init__(self, guild: Guild = None) -> None:
         
         self.DATABASE_PATH = "../database"
-        self.DATABASE_NAME = guild.id + ".db"
-        self.DIR_NAME = guild.id
+        self.DATABASE_NAME = str(guild.id) + ".db"
+        self.DIR_NAME = str(guild.id)
+        
         self.DATABASE_STATUS = self.check_dir()
         
         if not self.DATABASE_STATUS:
@@ -34,11 +36,11 @@ class GuildDatabase:
             bool: Database exists or not.
         """
 
-        db_list = os.listdir(self.DATABASE_PATH + "/")
+        db_list = os.listdir(self.DATABASE_PATH + "/"
+)
         
         for db in db_list:
             
-            print(db)
             if str(self.DIR_NAME) in db:
 
                 return True
@@ -49,7 +51,10 @@ class GuildDatabase:
     def database_setup(self):
         
         os.mkdir(self.DATABASE_PATH + "/" + self.DIR_NAME)
-        open(self.DATABASE_PATH + "/" + self.DIR_NAME + "/roles.json")
+        open(f"{self.DATABASE_PATH}/{self.DIR_NAME}/roles.json", "w")
+
+        with open(self.DATABASE_PATH + "/" + self.DIR_NAME + "/roles.json", "w") as fp:
+            fp.write(json.dumps({}, indent=2))
         
         self.__conn = sqlite3.connect(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.DATABASE_NAME}")
         self.__cursor = self.__conn.cursor()

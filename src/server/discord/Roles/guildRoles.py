@@ -24,17 +24,23 @@ class GuildRoles:
             Exception: Guild default template not found (file missing).
         """
         
-        self.guild = guild
-        self.DATABASE_NAME = guild.id
+        self.DATABASE_NAME = str(guild.id)
         self.DEFAULT_TEMPLATE_PATH = "Roles/default.json"
-        self.DATABASE_PATH = f"../../database/{self.DATABASE_NAME}/roles.json"
+        self.DATABASE_PATH = f"../database/{self.DATABASE_NAME}/roles.json"
         
+        # Checks for the existance of default.json file.
         if path.isfile(self.DEFAULT_TEMPLATE_PATH) is False:
             raise Exception("File not found")
         
-        with open(self.DATABASE_PATH) as fp:
-            self.__guildroles = json.load(fp)
+        # Attempts to open guild roles.json.
+        try:
+            with open(self.DATABASE_PATH) as fp:
+                self.__guildroles = json.load(fp)
+        # Throws exception when guild profile not found.
+        except FileNotFoundError:
+            raise Exception("Guild profile does not exist.")
         
+        # Checks if the size of the guild profile is zero. If it is, create a default guild role profile.
         if self.__sizeof__() == 0:
             self.__initRoles()
     
@@ -59,7 +65,7 @@ class GuildRoles:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
-    def createRole(self, name: str, role_id: int = None, emoji_id: str = None, colour: str = Colour.random()) -> None:
+    def createRole(self, name: str, role_id: int = None, emoji_id: str = None, emojiref: str = None, colour: str = Colour.random()) -> None:
         """Creates a role. Default none-types must be checked.
 
         Args:
@@ -69,7 +75,7 @@ class GuildRoles:
             colour (str, optional): The color of the role. Gives random color if none is given. Defaults to Colour.random().
         """
         
-        self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id, 'colour': colour}
+        self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id, "emojiref": emojiref, 'colour': colour}
         
         with open(self.DEFAULT_TEMPLATE_PATH, 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
@@ -100,7 +106,7 @@ class GuildRoles:
         Raises:
             Exception: If category other than role_id/emoji_id/colour is inputted, exception is raised.
         """
-        if not (["role_id", "emoji_id", "colour"].__contains__(category)):
+        if not (["role_id", "emoji_id", "emojiref", "colour"].__contains__(category)):
             
             raise Exception("Category not supported.")
             
@@ -126,3 +132,4 @@ class GuildRoles:
     
     def __str__(self) -> str:
         return str(self.__guildroles)
+
