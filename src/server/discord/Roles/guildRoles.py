@@ -65,17 +65,18 @@ class GuildRoles:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
             
     
-    def createRole(self, name: str, role_id: int = None, emoji_id: str = None, emojiref: str = None, colour: str = Colour.random()) -> None:
+    def createRole(self, name: str, role_id: int = None,emoji_id: str = None,  colour: str = Colour.random()) -> None:
         """Creates a role. Default none-types must be checked.
 
         Args:
             name (str): Name of the role.
             role_id (int, optional): Role id that is connected to discord.Role. Defaults to None.
+            custom_id (str, optional): Custom id that needs to be set in order for persistent buttons.
             emoji_id (str, optional): Emoji that is related to the role. Defaults to None.
             colour (str, optional): The color of the role. Gives random color if none is given. Defaults to Colour.random().
         """
         
-        self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id, "emojiref": emojiref, 'colour': colour}
+        self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id, "custom_id": self.DATABASE_NAME + role_id, 'colour': colour}
         
         with open(self.DEFAULT_TEMPLATE_PATH, 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
@@ -106,7 +107,7 @@ class GuildRoles:
         Raises:
             Exception: If category other than role_id/emoji_id/colour is inputted, exception is raised.
         """
-        if not (["role_id", "emoji_id", "emojiref", "colour"].__contains__(category)):
+        if not (["role_id", "custom_id", "emoji_id", "colour"].__contains__(category)):
             
             raise Exception("Category not supported.")
             

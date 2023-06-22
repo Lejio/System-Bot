@@ -15,17 +15,18 @@
 '''
 import os
 from datetime import datetime
-from typing import Optional, Literal
-
-
-import discord
-from discord.ext import commands
-from dotenv import load_dotenv
+from typing import Any, Optional, Literal, Type
 import tracemalloc
 
+import discord
+from discord import app_commands
+from discord.ext import commands
+from discord.ui import View
+from dotenv import load_dotenv
 
 from Roles.connector import GuildDatabase
 from Roles.guildRoles import GuildRoles
+from Roles.role import RoleView
 
 client = commands.Bot(command_prefix="!sys ", intents=discord.Intents.all())
 cogs: list = ["Roles.role", "admin"]
@@ -33,6 +34,15 @@ load_dotenv()
 
 embed = None
 
+class dingbong(View):
+  
+  def __init__(self):
+     super().__init__(timeout=None)
+     
+  @discord.ui.button(label="bing", style=discord.ButtonStyle.blurple, custom_id="chingchong")
+  async def bong(self, interaction: discord.Interaction, button: discord.ui.Button):
+    
+    await interaction.response.send_message("bong")
 
 @client.event
 async def on_ready():
@@ -55,9 +65,23 @@ async def on_ready():
   except commands.ExtensionAlreadyLoaded:
     
     print("Extension already loaded")
+
+
+@client.event
+async def setup_hook():
   
-  # synced = await client.tree.sync()
-  # print(f"Synced {len(synced)} commands.")
+#     # RoleView is a view that is generated on every server the client is in. I want to
+#     # make all of the views in all of the servers persistent. My initial thought was something like this:
+  client.add_view(dingbong())    
+  # guilds = client.guilds
+  # for g in guilds:
+
+  #   client.add_view(RoleView(g))
+    
+#   # It does not work. Am I doing something wrong?
+    
+  print("\nSetting up persistent views.")
+  
     
 @client.event
 async def on_guild_join(guild: discord.Guild):
@@ -70,7 +94,6 @@ async def on_guild_join(guild: discord.Guild):
 async def on_member_join(member):
   role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
   await member.add_roles(role)
-  
 
 # Credit to Umbra for this amazing sync command!
 # https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html
@@ -107,6 +130,13 @@ async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], s
 
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
+
+@client.tree.command(name="bing", description="A bong echoer.")
+async def bing(interaction: discord.Interaction, member: discord.Member):
+  
+  v = dingbong()
+  
+  await interaction.response.send_message(view=v)
 
 @client.tree.command(name="hello", description="A hello echoer.")
 async def hello(interaction: discord.Interaction, member: discord.Member):
