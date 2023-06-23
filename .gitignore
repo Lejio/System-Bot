@@ -49,3 +49,4 @@ guildRoles.json
 package.nls.*.json
 l10n/
 .env
+*.log

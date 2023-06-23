@@ -15,18 +15,17 @@
 '''
 import os
 from datetime import datetime
-from typing import Any, Optional, Literal, Type
+from typing import Any, Optional, Literal
 import tracemalloc
 
 import discord
-from discord import app_commands
 from discord.ext import commands
-from discord.ui import View
+
+# from discord.types.components import ButtonComponent as ButtonComponentPayload
 from dotenv import load_dotenv
+import logging
 
 from Roles.connector import GuildDatabase
-from Roles.guildRoles import GuildRoles
-from Roles.role import RoleView
 
 client = commands.Bot(command_prefix="!sys ", intents=discord.Intents.all())
 cogs: list = ["Roles.role", "admin"]
@@ -34,109 +33,49 @@ load_dotenv()
 
 embed = None
 
-class dingbong(View):
-  
-  def __init__(self):
-     super().__init__(timeout=None)
+class SystemBot(commands.Bot):
+
+  def __init__(self, command_prefix="!sys", description: str | None = None, intents=discord.Intents.all(), **options: Any) -> None:
+     super().__init__(command_prefix, description=description, intents=intents, **options)
      
-  @discord.ui.button(label="bing", style=discord.ButtonStyle.blurple, custom_id="chingchong")
-  async def bong(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+  async def on_ready(self):
+    """
+    Client event. Runs when the bot is ready and has successfully logged in.
+    """
+    tracemalloc.start()
+
+    print(f"\n{datetime.utcnow()}: Logged in successfully as: " + str(client.user) + "\n")
+
+    try:
+      
+      for cog in cogs:  # Loads each config into the client.
+
+        await client.load_extension(cog)
+        print(f"Loaded cog {cog}")
+
+      print("Successfully loaded all Cogs\n")
+      
+    except commands.ExtensionAlreadyLoaded:
+      
+      print("Extension already loaded")
+      
+    a = await self.tree.sync()
+    print(f"{len(a)} Synced")
     
-    await interaction.response.send_message("bong")
-
-@client.event
-async def on_ready():
-  """
-  Client event. Runs when the bot is ready and has successfully logged in.
-  """
-  tracemalloc.start()
-
-  print(f"\n{datetime.utcnow()}: Logged in successfully as: " + str(client.user) + "\n")
-
-  try:
     
-    for cog in cogs:  # Loads each config into the client.
+  async def on_guild_join(self, guild: discord.Guild):
 
-      await client.load_extension(cog)
-      print(f"Loaded cog {cog}")
-
-    print("Successfully loaded all Cogs\n")
-    
-  except commands.ExtensionAlreadyLoaded:
-    
-    print("Extension already loaded")
-
-
-@client.event
-async def setup_hook():
+    GuildDatabase(guild=guild)
   
-#     # RoleView is a view that is generated on every server the client is in. I want to
-#     # make all of the views in all of the servers persistent. My initial thought was something like this:
-  client.add_view(dingbong())    
-  # guilds = client.guilds
-  # for g in guilds:
 
-  #   client.add_view(RoleView(g))
+  async def on_member_join(self, member):
+    role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
+    await member.add_roles(role)
     
-#   # It does not work. Am I doing something wrong?
     
-  print("\nSetting up persistent views.")
-  
-    
-@client.event
-async def on_guild_join(guild: discord.Guild):
+client = SystemBot()
 
-  GuildDatabase(guild=guild)
-  
-    
-
-@client.event
-async def on_member_join(member):
-  role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
-  await member.add_roles(role)
-
-# Credit to Umbra for this amazing sync command!
-# https://about.abstractumbra.dev/discord.py/2023/01/29/sync-command-example.html
-@client.command()
-@commands.guild_only()
-@commands.is_owner()
-async def sync(ctx: commands.Context, guilds: commands.Greedy[discord.Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
-    if not guilds:
-        if spec == "~":
-            synced = await ctx.bot.tree.sync(guild=ctx.guild)
-        elif spec == "*":
-            ctx.bot.tree.copy_global_to(guild=ctx.guild)
-            synced = await ctx.bot.tree.sync(guild=ctx.guild)
-        elif spec == "^":
-            ctx.bot.tree.clear_commands(guild=ctx.guild)
-            await ctx.bot.tree.sync(guild=ctx.guild)
-            synced = []
-        else:
-            synced = await ctx.bot.tree.sync()
-
-        await ctx.send(
-            f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
-        )
-        return
-
-    ret = 0
-    for guild in guilds:
-        try:
-            await ctx.bot.tree.sync(guild=guild)
-        except discord.HTTPException:
-            pass
-        else:
-            ret += 1
-
-    await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
-
-
-@client.tree.command(name="bing", description="A bong echoer.")
-async def bing(interaction: discord.Interaction, member: discord.Member):
-  
-  v = dingbong()
-  
-  await interaction.response.send_message(view=v)
 
 @client.tree.command(name="hello", description="A hello echoer.")
 async def hello(interaction: discord.Interaction, member: discord.Member):
@@ -169,10 +108,6 @@ async def checkRoles(interaction: discord.Interaction, member: discord.Member):
   await interaction.response.send_message(roles)
   
 
-# @client.tree.command()
-
-
-
 @client.command("isowner?")
 @commands.check_any(commands.is_owner())
 async def owner(ctx):
@@ -202,8 +137,6 @@ async def statusbot(ctx):
   print("Current Memory [KB]: " + str(round(a/1024)))
   print("Peak Memory [KB]: " + str(round(b/1024)))
   
-  
-  
 
 @client.command("kill")
 @commands.check_any(commands.is_owner())
@@ -219,6 +152,6 @@ async def killbot(ctx):
 """
   Runs the bot. Sometimes it gets a TooManyRequests error. In which it would promptly kill the program and restart. (This is the only current known fix).
 """
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
-
-client.run(os.environ['OPENAI_KEY'])
+client.run(os.environ['OPENAI_KEY'], log_handler=handler)

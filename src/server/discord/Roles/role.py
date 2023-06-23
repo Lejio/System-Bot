@@ -1,15 +1,15 @@
-from typing import Optional
+from discord.enums import ButtonStyle
+from discord.interactions import Interaction
 from discord.ui import Button
 from discord import Guild, ButtonStyle, Interaction, app_commands, Colour, utils
 from discord.ui import View
 from discord.ext import commands
 from discord import Embed
 from discord import PermissionOverwrite
-# from discord.utils import 
 
 from Roles.connector import GuildDatabase
 from Roles.guildRoles import GuildRoles
-
+    
 
 class RoleButton(Button):
     
@@ -21,8 +21,6 @@ class RoleButton(Button):
         self.role_id = role_id
         self.guild = guild
         self.custom_id = custom_id
-        
-        print(f"{self.role.name}" + self.custom_id)
         
         
     async def callback(self, interaction: Interaction):
@@ -48,10 +46,12 @@ class RoleView(View):
         super().__init__(timeout=None)
         
         GuildDatabase(guild)
-        self.a = Guild
         self.__guildroles = GuildRoles(guild)
+        
         self.__roles = self.__guildroles.getGuildRoles()
         self.__guild = guild
+        
+        self.createButtons()
         
     
     def createButtons(self):
@@ -77,7 +77,7 @@ class Role(commands.Cog):
         super().__init__()
         
     
-    @app_commands.command(name="init-roles", description="Button Embed Testing")
+    @app_commands.command(name="inititialize-role-selector", description="Button Embed Testing")
     @app_commands.default_permissions(administrator=True)
     async def buttonTest(self, interaction: Interaction):
         """
@@ -88,17 +88,14 @@ class Role(commands.Cog):
         """
 
         # Creates a Discord View object.
+        guildroles = GuildRoles(interaction.guild)
+        
+        if not (guildroles.__status__()):
+            await self.initRoles(interaction.guild, guildroles)
+            guildroles.__changestatus__()
+        
         roleView = RoleView(interaction.guild)
         roles = roleView.getRoles()
-        guildroles = roleView.getGuildRoles()
-        
-        try:
-            roleView.createButtons()
-        
-        except TypeError:
-            print("Creating default roles.")
-            await self.initRoles(interaction.guild, guildroles)
-            roleView.createButtons()
             
         embedBody = ""
         
@@ -113,7 +110,24 @@ class Role(commands.Cog):
         # Sends view as interaction.
         await channel.send(view=roleView, embed=embed)
         await interaction.response.send_message("Created new roles channel.")
+    
+    
+    async def initRoles(self, guild: Guild, guildRoles: GuildRoles):
+        """Generates the default roles contained in default.json.
+
+        Args:
+            guild (Guild): Interaction guild.
+            guildRoles (GuildRoles): Guild json connector.
+        """
+        for r in guildRoles.getGuildRoles():
+            await guild.create_role(name=r, colour=Colour.from_str(guildRoles.getGuildRoles()[r]["colour"]), reason="SYS INITIAL ROLE")
         
+        for r in guildRoles.getGuildRoles():          
+            role_id = str(utils.get(guild.roles, name=r).id)
+            
+            guildRoles.editRole(name=r, category="role_id", newVal=role_id)
+            guildRoles.editRole(name=r, category="custom_id", newVal=str(guild.id) + str(role_id))
+    
     
     async def createRoleTextChannel(self, guild: Guild):
         
@@ -133,39 +147,40 @@ class Role(commands.Cog):
     async def removeallroles(self, interaction: Interaction):
         
         roles = interaction.guild.roles
+        guildrole = GuildRoles(interaction.guild)
         
-        await interaction.response.send_message("Deleted all roles.")
+        await interaction.response.send_message("Deleting all roles.")
         
         for r in roles:
+            
+            if r != interaction.guild.default_role and not r.permissions.administrator:
+                if (r.id == int(guildrole.getGuildRoles()[r.name]['role_id'])):
+                    await r.delete()
+            
+            
+    @app_commands.command(name="forceremoveall", description="REMOVES ALL ROLES")
+    @app_commands.default_permissions(administrator=True)
+    async def forceremove(self, interaction: Interaction):
+        
+        roles = interaction.guild.roles
+        
+        await interaction.response.send_message("Deleting all roles.")
+        
+        for r in roles:
+            
             if r != interaction.guild.default_role and not r.permissions.administrator:
                 await r.delete()
         
-    
-    async def initRoles(self, guild: Guild, guildRoles: GuildRoles):
-        """Generates the default roles contained in default.json.
 
-        Args:
-            guild (Guild): Interaction guild.
-            guildRoles (GuildRoles): Guild json connector.
-        """
-        for r in guildRoles.getGuildRoles():
-            role = await guild.create_role(name=r, colour=Colour.from_str(guildRoles.getGuildRoles()[r]["colour"]), reason="SYS INITIAL ROLE")
-                        
-            role_id = str(utils.get(guild.roles, name=r).id)
-            
-            guildRoles.editRole(name=r, category="role_id", newVal=role_id)
-            guildRoles.editRole(name=r, category="custom_id", newVal=str(guild.id) + str(role_id))
-            
-    @app_commands.command(name="logocheck", description="Checks logo")
-    @app_commands.default_permissions(administrator=True)
-    async def logocheck(self, interaction: Interaction):
-        
-        await interaction.response.send_message("<:leagueoflegendslogo:1118578542658203758>")
 
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Role())
+    
     guilds = bot.guilds
+    
     for g in guilds:
-
-        bot.add_view(RoleView(g))
+        gd = GuildDatabase(g)
+        gr = GuildRoles(g)
+        if gr.__status__():
+            bot.add_view(RoleView(g))

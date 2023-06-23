@@ -76,7 +76,7 @@ class GuildRoles:
             colour (str, optional): The color of the role. Gives random color if none is given. Defaults to Colour.random().
         """
         
-        self.__guildroles[name] = {'role_id': role_id, "emoji_id": emoji_id, "custom_id": self.DATABASE_NAME + role_id, 'colour': colour}
+        self.__guildroles['roles'][name] = {'role_id': role_id, "emoji_id": emoji_id, "custom_id": self.DATABASE_NAME + role_id, 'colour': colour}
         
         with open(self.DEFAULT_TEMPLATE_PATH, 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
@@ -88,7 +88,7 @@ class GuildRoles:
         Args:
             name (str): Role name.
         """
-        del self.__guildroles[name]
+        del self.__guildroles['roles'][name]
         
         with open(self.DATABASE_PATH , 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
@@ -111,7 +111,7 @@ class GuildRoles:
             
             raise Exception("Category not supported.")
             
-        self.__guildroles[name][category] = newVal
+        self.__guildroles['roles'][name][category] = newVal
         
         with open(self.DATABASE_PATH , 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
@@ -124,8 +124,20 @@ class GuildRoles:
             dict: Current roles and its properties.
         """
         
-        return self.__guildroles
+        return self.__guildroles["roles"]
 
+
+    def __status__(self) -> bool:
+        
+        return self.__guildroles['properties']['initialized']
+    
+    
+    def __changestatus__(self) -> None:
+        
+        self.__guildroles['properties']['initialized'] = not self.__guildroles['properties']['initialized']
+
+        with open(self.DATABASE_PATH , 'w') as json_file:
+            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
     
     def __sizeof__(self) -> int:
         return len(self.__guildroles)
