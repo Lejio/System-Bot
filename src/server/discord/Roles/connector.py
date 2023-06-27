@@ -52,6 +52,7 @@ class GuildDatabase:
         
         os.mkdir(self.DATABASE_PATH + "/" + self.DIR_NAME)
         open(f"{self.DATABASE_PATH}/{self.DIR_NAME}/roles.json", "w")
+        open(f"{self.DATABASE_PATH}/{self.DIR_NAME}/config.json", "w")
 
         with open(self.DATABASE_PATH + "/" + self.DIR_NAME + "/roles.json", "w") as fp:
             fp.write(json.dumps({}, indent=2))

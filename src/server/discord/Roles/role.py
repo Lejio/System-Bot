@@ -130,7 +130,7 @@ class Role(commands.Cog):
         # To delete the role channel, I have to keep track of the channel ID, pref in a json.
         
         overwrites = {
-        guild.default_role: PermissionOverwrite(read_messages=True, send_messages=False, add_reactions=False, use_application_commands=False, send_voice_messages=False, mention_everyone=False),
+        guild.default_role: PermissionOverwrite(read_messages=True, send_messages=False, add_reactions=False, use_application_commands=False, mention_everyone=False),
         guild.me: PermissionOverwrite(read_messages=True)
         }
 
@@ -165,22 +165,27 @@ class Role(commands.Cog):
     @app_commands.command(name="remove-system", description="REMOVES ALL ROLES")
     @app_commands.default_permissions(administrator=True)
     async def forceremove(self, interaction: Interaction):
-        
         await self.removeRoles(interaction)
         
         guild = interaction.guild
         
         roleChannel = utils.get(guild.channels, name="choose-your-role")
         
+        cmdGroup = utils.get(guild.categories, name="System Command Center")
+        
+        for txtchannel in cmdGroup.channels:
+            await txtchannel.delete()
+        
+        await cmdGroup.delete()
+        
            # if the channel exists
         if roleChannel is not None:
             await roleChannel.delete()
+            await interaction.response.send_message("Complete removal of System from server completed.")
+
         # if the channel does not exist, inform the user
         else:
             await interaction.response.send_message(f'No channel named, choose-your-role, was found')
-            
-        await interaction.response.send_message("Complete removal of System from server completed.")
-
 
 
 async def setup(bot: commands.Bot):
