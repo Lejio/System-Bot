@@ -2,9 +2,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from roleEnum import REG_COLORS, DARK_COLORS, LIGHT_COLORS
-from Roles.guildRoles import GuildRoles
-from roleDbConnector import RoleDatabase
+from sysenum import REG_COLORS, DARK_COLORS, LIGHT_COLORS
+from Roles.guildroles import GuildRoles
+# from roleDbConnector import RoleDatabase
 
 # Class decorator. Since GroupCog is the parent, then the permissions of the parent override its children.
 @app_commands.default_permissions(administrator=True)
@@ -14,22 +14,8 @@ class Admin(commands.GroupCog):
         super().__init__()
 
         self.bot = bot;
-    
-    @app_commands.command(name="backup_role_database", description="Programming purposes.")
-    async def extractroles(self, interaction: discord.Interaction, backup_db_name: str):
-        
-        roleDB = RoleDatabase(backup_db_name)
-        
-        a = interaction.guild.members
-        
-        for i in a:
-            roleDB.add_member(i)
-            
-        roleDB.close()
-        
-        await interaction.response.send_message(f"Role database updated successfully.")
-        
-    
+
+
     # https://discordpy.readthedocs.io/en/stable/api.html?highlight=create_role#discord.Guild.create_role
     @app_commands.command(name="role-create", description="Creates a role based on given parameters.")
     @app_commands.describe(dark_color="Dark color selector", light_color="Light color selector", reg_color="Default colors")
@@ -37,7 +23,7 @@ class Admin(commands.GroupCog):
                           light_color=[discord.app_commands.Choice(name=color.name, value=color.value) for color in LIGHT_COLORS],
                           reg_color=[discord.app_commands.Choice(name=color.name, value=color.value) for color in REG_COLORS])
 
-    async def createrole(self, interaction: discord.Interaction, name: str, reg_color: discord.app_commands.Choice[int]=None, dark_color: discord.app_commands.Choice[int]=None, light_color: discord.app_commands.Choice[int]=None, reason: str = None):
+    async def createRole(self, interaction: discord.Interaction, name: str, reg_color: discord.app_commands.Choice[int]=None, dark_color: discord.app_commands.Choice[int]=None, light_color: discord.app_commands.Choice[int]=None, reason: str = None):
         
         if ([reg_color, dark_color, light_color].count(None) < 2):
             await interaction.response.send_message("You can only choose one color!")
@@ -73,8 +59,6 @@ class Admin(commands.GroupCog):
         except discord.errors.HTTPException:
             await interaction.response.send_message("Invalid role!")
             
-        
-        
     
     @app_commands.command(name="testcommand", description="Test")
     async def test(self, interaction: discord.Interaction):

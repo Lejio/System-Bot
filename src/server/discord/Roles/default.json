@@ -69,8 +69,10 @@
   },
   "properties": {
     "initialized": false,
-    "default_role_unverified": "Unverified",
-    "default_role_verified": "Verified",
+    "default_role_unverified_name": "Unverified",
+    "default_role_unverified_id": 0,
+    "default_role_verified_name": "Verified",
+    "default_role_verified_id": 0,
     "default_role_colour": null
   }
 }

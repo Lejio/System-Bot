@@ -13,6 +13,9 @@ class GuildDatabase:
         self.DATABASE_NAME = str(guild.id) + ".db"
         self.DIR_NAME = str(guild.id)
         
+        self.ROLE = "role.json"
+        self.CONFIG = "config.json"
+        
         self.DATABASE_STATUS = self.check_dir()
         
         if not self.DATABASE_STATUS:
@@ -51,10 +54,13 @@ class GuildDatabase:
     def database_setup(self):
         
         os.mkdir(self.DATABASE_PATH + "/" + self.DIR_NAME)
-        open(f"{self.DATABASE_PATH}/{self.DIR_NAME}/roles.json", "w")
-        open(f"{self.DATABASE_PATH}/{self.DIR_NAME}/config.json", "w")
+        open(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.ROLE}", "w")
+        open(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.CONFIG}", "w")
 
-        with open(self.DATABASE_PATH + "/" + self.DIR_NAME + "/roles.json", "w") as fp:
+        with open(self.DATABASE_PATH + "/" + self.DIR_NAME + "/" + self.ROLE, "w") as fp:
+            fp.write(json.dumps({}, indent=2))
+            
+        with open(self.DATABASE_PATH + "/" + self.DIR_NAME + "/" + self.CONFIG, "w") as fp:
             fp.write(json.dumps({}, indent=2))
         
         self.__conn = sqlite3.connect(f"{self.DATABASE_PATH}/{self.DIR_NAME}/{self.DATABASE_NAME}")

@@ -6,7 +6,7 @@ from discord.enums import ButtonStyle
 
 
 from Roles.connector import GuildDatabase
-from Roles.guildRoles import GuildRoles
+from Roles.guildroles import GuildRoles
     
 
 class RoleButton(Button):

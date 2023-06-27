@@ -22,6 +22,7 @@ class GuildRoles:
         self.DATABASE_NAME = str(guild.id)
         self.DEFAULT_TEMPLATE_PATH = "Roles/default.json"
         self.DATABASE_PATH = f"../database/{self.DATABASE_NAME}/roles.json"
+        self.INDENT = 4
         
         # Checks for the existance of default.json file.
         if path.isfile(self.DEFAULT_TEMPLATE_PATH) is False:
@@ -57,7 +58,7 @@ class GuildRoles:
         self.__guildroles = self.__roleObj
         
         with open(self.DATABASE_PATH , 'w') as json_file:
-            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+            json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
             
     
     def createRole(self, name: str, role_id: int = None,emoji_id: str = None,  colour: str = Colour.random()) -> None:
@@ -74,7 +75,7 @@ class GuildRoles:
         self.__guildroles['roles'][name] = {'role_id': role_id, "emoji_id": emoji_id, "custom_id": self.DATABASE_NAME + role_id, 'colour': colour}
         
         with open(self.DEFAULT_TEMPLATE_PATH, 'w') as json_file:
-            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+            json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
             
     
     def removeRole(self, name: str) -> True:
@@ -86,7 +87,7 @@ class GuildRoles:
         del self.__guildroles['roles'][name]
         
         with open(self.DATABASE_PATH , 'w') as json_file:
-            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+            json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
             
         return True
             
@@ -109,7 +110,7 @@ class GuildRoles:
         self.__guildroles['roles'][name][category] = newVal
         
         with open(self.DATABASE_PATH , 'w') as json_file:
-            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+            json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
             
     
     def getGuildRoles(self) -> dict:
@@ -127,7 +128,7 @@ class GuildRoles:
         self.__changestatus__()
         
         with open(self.DATABASE_PATH , 'w') as json_file:
-            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+            json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
 
 
     def __status__(self) -> bool:
@@ -140,7 +141,7 @@ class GuildRoles:
         self.__guildroles['properties']['initialized'] = not self.__guildroles['properties']['initialized']
 
         with open(self.DATABASE_PATH , 'w') as json_file:
-            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+            json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
     
     
     def __sizeof__(self) -> int:

@@ -22,16 +22,15 @@ import tracemalloc
 import discord
 import logging
 
-from discord import PermissionOverwrite, utils
+from discord import PermissionOverwrite
 from discord.ext import commands
 
 from dotenv import load_dotenv
 
 from Roles.connector import GuildDatabase
-from Roles.guildRoles import GuildRoles
 
 client = commands.Bot(command_prefix="!sys ", intents=discord.Intents.all())
-cogs: list = ["Roles.role", "admin"]
+cogs: list = ["Roles.role", "Admin.admin"]
 load_dotenv()
 
 embed = None
@@ -75,7 +74,6 @@ class SystemBot(commands.Bot):
     
   async def on_guild_join(self, guild: discord.Guild):
     
-    # Make sure the system-remove command removes the admin command centers.
     # Make sure the system message/channel settings are correct.
     # Why is the ordering still off even though it is assigned to 0?
     # Remove default voice/text channels?
@@ -91,7 +89,7 @@ class SystemBot(commands.Bot):
     await cmdcenter.create_text_channel(name="Admin Text Channel")
     await cmdcenter.create_voice_channel(name="Command Emergency Meeting")
     
-    print(cmdcenter.position)
+    # print(cmdcenter.position)
 
   async def on_member_join(self, member):
     role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
