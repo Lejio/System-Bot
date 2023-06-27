@@ -11,19 +11,20 @@
     
     Commands (basic not including features):
     
+    (new) - Default role that is granted for everyone entering the server for the first time. This role would have access to the verify channel and is then prompted to click a button. A admin would have to let that person in.
     
 '''
 import os
 from datetime import datetime
-from typing import Any, Optional, Literal
+from typing import Any
 import tracemalloc
 
 import discord
+import logging
+
 from discord.ext import commands
 
-# from discord.types.components import ButtonComponent as ButtonComponentPayload
 from dotenv import load_dotenv
-import logging
 
 from Roles.connector import GuildDatabase
 
@@ -32,6 +33,7 @@ cogs: list = ["Roles.role", "admin"]
 load_dotenv()
 
 embed = None
+
 
 class SystemBot(commands.Bot):
 
@@ -65,8 +67,10 @@ class SystemBot(commands.Bot):
     
     
   async def on_guild_join(self, guild: discord.Guild):
-
+    
     GuildDatabase(guild=guild)
+    await guild.create_category("System Command Center")
+    
   
 
   async def on_member_join(self, member):

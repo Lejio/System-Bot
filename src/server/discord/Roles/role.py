@@ -1,18 +1,15 @@
-from discord.enums import ButtonStyle
-from discord.interactions import Interaction
-from discord.ui import Button
-from discord import Guild, ButtonStyle, Interaction, app_commands, Colour, utils
-from discord.ui import View
+from discord import Guild, ButtonStyle, Interaction, app_commands, Colour, utils, Embed, PermissionOverwrite
 from discord.ext import commands
-from discord import Embed
-from discord import PermissionOverwrite
+from discord.interactions import Interaction
+from discord.ui import Button, View
+from discord.enums import ButtonStyle
+
 
 from Roles.connector import GuildDatabase
 from Roles.guildRoles import GuildRoles
     
 
 class RoleButton(Button):
-    
     
     def __init__(self, role_id: int, guild: Guild, emoji: str = None, custom_id: str = str):
         
@@ -47,7 +44,6 @@ class RoleView(View):
         
         GuildDatabase(guild)
         self.__guildroles = GuildRoles(guild)
-        
         self.__roles = self.__guildroles.getGuildRoles()
         self.__guild = guild
         
@@ -133,44 +129,57 @@ class Role(commands.Cog):
         
         # To delete the role channel, I have to keep track of the channel ID, pref in a json.
         
-        # https://discordpy.readthedocs.io/en/stable/api.html#discord.Guild.create_text_channel
         overwrites = {
-        guild.default_role: PermissionOverwrite(read_messages=True, send_messages=False, add_reactions=False, use_application_commands=False),
+        guild.default_role: PermissionOverwrite(read_messages=True, send_messages=False, add_reactions=False, use_application_commands=False, send_voice_messages=False, mention_everyone=False),
         guild.me: PermissionOverwrite(read_messages=True)
         }
 
         return await guild.create_text_channel(name='choose-your-role', overwrites=overwrites)
         
     
-    @app_commands.command(name="removeall", description="REMOVES ALL ROLES")
+    @app_commands.command(name="remove-all-roles", description="REMOVES ALL ROLES SYSTEM BOT RELATED ROLES")
     @app_commands.default_permissions(administrator=True)
     async def removeallroles(self, interaction: Interaction):
         
+        await self.removeRoles(interaction=interaction)
+        
+        await interaction.response.send_message("Deleted all System related roles.")
+        
+        
+    
+    async def removeRoles(self, interaction: Interaction):
+        
         roles = interaction.guild.roles
         guildrole = GuildRoles(interaction.guild)
-        
-        await interaction.response.send_message("Deleting all roles.")
-        
+                
         for r in roles:
             
             if r != interaction.guild.default_role and not r.permissions.administrator:
-                if (r.id == int(guildrole.getGuildRoles()[r.name]['role_id'])):
-                    await r.delete()
+                try:
+                    if (r.id == int(guildrole.getGuildRoles()[r.name]['role_id'])):
+                        await r.delete()
+                except KeyError:
+                    pass
             
             
-    @app_commands.command(name="forceremoveall", description="REMOVES ALL ROLES")
+    @app_commands.command(name="remove-system", description="REMOVES ALL ROLES")
     @app_commands.default_permissions(administrator=True)
     async def forceremove(self, interaction: Interaction):
         
-        roles = interaction.guild.roles
+        await self.removeRoles(interaction)
         
-        await interaction.response.send_message("Deleting all roles.")
+        guild = interaction.guild
         
-        for r in roles:
+        roleChannel = utils.get(guild.channels, name="choose-your-role")
+        
+           # if the channel exists
+        if roleChannel is not None:
+            await roleChannel.delete()
+        # if the channel does not exist, inform the user
+        else:
+            await interaction.response.send_message(f'No channel named, choose-your-role, was found')
             
-            if r != interaction.guild.default_role and not r.permissions.administrator:
-                await r.delete()
-        
+        await interaction.response.send_message("Complete removal of System from server completed.")
 
 
 

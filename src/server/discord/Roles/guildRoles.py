@@ -3,12 +3,7 @@ from os import path
 
 from discord import Guild, Colour
 
-"""
-    Incomplete. next step is to generate server profiles.
-    Assume at initialization, no guildRoles json file will be present.
-    Have json init generate new role json for server.
-    
-"""
+
 class GuildRoles:
     """Manages the roles of a given guild.
     """
@@ -125,6 +120,14 @@ class GuildRoles:
         """
         
         return self.__guildroles["roles"]
+    
+    
+    def removeAllRoles(self) -> None:
+        
+        self.__changestatus__()
+        
+        with open(self.DATABASE_PATH , 'w') as json_file:
+            json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
 
 
     def __status__(self) -> bool:
@@ -138,6 +141,7 @@ class GuildRoles:
 
         with open(self.DATABASE_PATH , 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=2, separators=(',',': '))
+    
     
     def __sizeof__(self) -> int:
         return len(self.__guildroles)
