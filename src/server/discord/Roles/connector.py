@@ -13,7 +13,7 @@ class GuildDatabase:
         self.DATABASE_NAME = str(guild.id) + ".db"
         self.DIR_NAME = str(guild.id)
         
-        self.ROLE = "role.json"
+        self.ROLE = "roles.json"
         self.CONFIG = "config.json"
         
         self.DATABASE_STATUS = self.check_dir()

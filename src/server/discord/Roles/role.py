@@ -7,6 +7,7 @@ from discord.enums import ButtonStyle
 
 from Roles.connector import GuildDatabase
 from Roles.guildroles import GuildRoles
+from Admin.serverconfig import ServerConfig
     
 
 class RoleButton(Button):
@@ -168,10 +169,11 @@ class Role(commands.Cog):
         await self.removeRoles(interaction)
         
         guild = interaction.guild
+        servconf = ServerConfig(guild=guild)
         
         roleChannel = utils.get(guild.channels, name="choose-your-role")
         
-        cmdGroup = utils.get(guild.categories, name="System Command Center")
+        cmdGroup = utils.get(guild.categories, name=servconf.__getadminconfig__()["cmd_category_name"])
         
         for txtchannel in cmdGroup.channels:
             await txtchannel.delete()

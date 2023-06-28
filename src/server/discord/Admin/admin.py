@@ -10,10 +10,10 @@ from Roles.guildroles import GuildRoles
 @app_commands.default_permissions(administrator=True)
 class Admin(commands.GroupCog):
     
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, client: commands.Bot) -> None:
         super().__init__()
 
-        self.bot = bot;
+        self.client = client;
 
 
     # https://discordpy.readthedocs.io/en/stable/api.html?highlight=create_role#discord.Guild.create_role

@@ -1,24 +1,24 @@
 {
-    "admin_config": {
-        "cmd_category_name": "System Command Center",
-        "server_command_name": "server-commands",
-        "server_bot_news": "system-bot-updates",
-        "server_admin_channel": "admin-lounge"
+  "admin_config": {
+    "cmd_category_name": "System Command Center",
+    "server_command_name": "server-commands",
+    "server_bot_news": "system-bot-updates",
+    "server_admin_channel": "admin-lounge",
+    "server_admin_vc": "Admin Room"
+  },
+  "server_config": {
+    "server_gate": {
+      "welcome_category_name": "Welcome",
+      "unverified_channel_name": "verify",
+      "unverified_channel_text": "Please click on the button to get verified!",
+      "verified_channel_name": "landing-channel",
+      "verified_channel_text": ""
     },
-    "server_config": {
-        "server_gate": {
-          "welcome_category_name": "Welcome",
-          "unverified_channel_name": "verify",
-          "unverified_channel_text": "Please click on the button to get verified!",
-          "verified_channel_name": "landing-channel",
-          "verified_channel_text": ""
-        },
-        "role_config": {
-            "text": "Choose your role by clicking on the buttons below.\nTo undo, just click on the same button again."
-        },
-        "system_config": {
-            "embed_color": null
-        }
-    } 
-    
+    "role_config": {
+      "text": "Choose your role by clicking on the buttons below.\nTo undo, just click on the same button again."
+    },
+    "system_config": {
+      "embed_color": "0x3498DB"
+    }
+  }
 }

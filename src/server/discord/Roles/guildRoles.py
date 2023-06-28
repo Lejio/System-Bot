@@ -112,6 +112,27 @@ class GuildRoles:
         with open(self.DATABASE_PATH , 'w') as json_file:
             json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
             
+
+    def editDefaultRole(self, name: str, category: str, newVal) -> None:
+        """Edit existing role_id or emoji_id values of a exisiting role.
+
+        Args:
+            name (str): Name of role.
+            category (str): A property
+            newVal (_type_): New value you wish to input. No checks on correct values performed.
+
+        Raises:
+            Exception: If category other than the correct properties is inputted, exception is raised.
+        """
+        if not (["initialized", "default_role_unverified_name", "default_role_unverified_id", "default_role_verified_name", "default_role_verified_id", "default_role_colour"].__contains__(category)):
+            
+            raise Exception("Category not supported.")
+            
+        self.__guildroles['properties'][category] = newVal
+        
+        with open(self.DATABASE_PATH , 'w') as json_file:
+            json.dump(self.__guildroles, json_file, indent=self.INDENT, separators=(',',': '))
+            
     
     def getGuildRoles(self) -> dict:
         """Returns the guild roles as a two dimensional dictionary.

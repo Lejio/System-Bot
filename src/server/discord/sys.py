@@ -28,9 +28,11 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from Roles.connector import GuildDatabase
+from Roles.guildroles import GuildRoles
+from Admin.init import Initialize
 
 client = commands.Bot(command_prefix="!sys ", intents=discord.Intents.all())
-cogs: list = ["Roles.role", "Admin.admin"]
+cogs: list = ["Roles.role", "Admin.admin", "Admin.config"]
 load_dotenv()
 
 embed = None
@@ -74,25 +76,25 @@ class SystemBot(commands.Bot):
     
   async def on_guild_join(self, guild: discord.Guild):
     
-    # Make sure the system message/channel settings are correct.
-    # Why is the ordering still off even though it is assigned to 0?
-    # Remove default voice/text channels?
-    
     GuildDatabase(guild=guild)
+    defroles = GuildRoles(guild=guild)
     cmdcenter = await guild.create_category(name="System Command Center", overwrites={
       guild.default_role: PermissionOverwrite(read_messages=False)}, position=0)
     
+    uvrole = await guild.create_role(name=defroles.getGuildRoles()["properties"]["default_role_unverified_name"])
+    vrole = await guild.create_role(name=defroles.getGuildRoles()["properties"]["default_role_verified_name"])
+    
+    defroles.editDefaultRole(name=uvrole.name, category="default_role_unverified_id", newVal=str(uvrole.id))
+    defroles.editDefaultRole(name=vrole.name, category="default_role_verified_id", newVal=str(vrole.id))
     cmdcenter.position = 0
     
-    await cmdcenter.create_text_channel(name="Server Commands")
-    await cmdcenter.create_text_channel(name="System Bot News")
-    await cmdcenter.create_text_channel(name="Admin Text Channel")
-    await cmdcenter.create_voice_channel(name="Command Emergency Meeting")
+    init = Initialize(cmdcenter)
+    await init.setup()
     
-    # print(cmdcenter.position)
 
-  async def on_member_join(self, member):
-    role = discord.utils.get(member.guild.roles, name='Cybertronian Plebs')
+  async def on_member_join(self, member: discord.Member):
+    defroles = GuildRoles(guild=member.guild)
+    role = discord.utils.get(member.guild.roles, name=defroles.getGuildRoles()["properties"]["default_role_unverified_id"])
     await member.add_roles(role)
     
     

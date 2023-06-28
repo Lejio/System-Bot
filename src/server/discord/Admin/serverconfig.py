@@ -6,17 +6,16 @@ class ServerConfig:
     
     def __init__(self, guild: Guild) -> None:
         
-        self.DEFAULT_CONFIG_NAME = "defaultconfig.json"
+        self.DEFAULT_CONFIG_NAME = "Admin/defaultconfig.json"
         self.ADMIN_CONFIG = "admin_config"
         self.SERVER_CONFIG = "server_config"
         self.SERVER_GATE = "server_gate"
         self.ROLE_CONFIG = "role_config"
         self.SYSTEM_CONFIG = "system_config"
-        self.JSON_PATH = f"../database/{str(guild.id)}/roles.json"
+        self.JSON_PATH = f"../database/{str(guild.id)}/config.json"
         self.INDENT = 4
         
         self.__server_config = {}
-        self.__guild = guild.id
         
         try:
             with open(self.JSON_PATH) as fp:
@@ -35,11 +34,11 @@ class ServerConfig:
             # Throws exception when guild profile not found.
             except FileNotFoundError:
                 raise Exception("Default config does not exist.")
-    
+                
 
     def __getadminconfig__(self) -> dict:
         
-        return self.__default_config[self.ADMIN_CONFIG]
+        return self.__server_config[self.ADMIN_CONFIG]
     
     
     def editAdminConfig(self, category: str, new_value: str):
@@ -49,7 +48,7 @@ class ServerConfig:
     
     def __getserverconfig__(self) -> dict:
         
-        return self.__default_config[self.SERVER_CONFIG]
+        return self.__server_config[self.SERVER_CONFIG]
     
     
     def __getservergate__(self) -> dict:
