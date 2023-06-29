@@ -22,8 +22,9 @@ import tracemalloc
 import discord
 import logging
 
-from discord import PermissionOverwrite, Embed
+from discord import PermissionOverwrite, Embed, Button, ButtonStyle
 from discord.ext import commands
+from discord.ui import View
 
 from dotenv import load_dotenv
 
@@ -106,8 +107,7 @@ class SystemBot(commands.Bot):
     await welcome.set_permissions(target=uvrole, read_messages=True, send_messages=False, add_reactions=False)
     
     welcome_embed = Embed(title=f"Welcome to {guild.name}")
-    
-    welcome_channel.send()
+    # welcome_channel.send()
 
     
     # Set up view button that sends a another view into the command center for entry approval.
