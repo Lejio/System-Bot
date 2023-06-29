@@ -22,7 +22,7 @@ import tracemalloc
 import discord
 import logging
 
-from discord import PermissionOverwrite
+from discord import PermissionOverwrite, Embed
 from discord.ext import commands
 
 from dotenv import load_dotenv
@@ -78,15 +78,40 @@ class SystemBot(commands.Bot):
     
     GuildDatabase(guild=guild)
     defroles = GuildRoles(guild=guild)
+    
+    uvrole = await guild.create_role(name="Archive")
+    
+    for cat in guild.categories:
+      await cat.edit(overwrites={
+        guild.default_role: PermissionOverwrite(read_messages=False)
+      })
+      for chan in cat.channels:
+        await chan.edit(sync_permissions=True)
+    
     cmdcenter = await guild.create_category(name="System Command Center", overwrites={
       guild.default_role: PermissionOverwrite(read_messages=False)}, position=0)
     
-    uvrole = await guild.create_role(name=defroles.getGuildRoles()["properties"]["default_role_unverified_name"])
-    vrole = await guild.create_role(name=defroles.getGuildRoles()["properties"]["default_role_verified_name"])
+    
+    uvrole = await guild.create_role(name=defroles.getGuildProperties()["default_role_unverified_name"])
+    vrole = await guild.create_role(name=defroles.getGuildProperties()["default_role_verified_name"])
     
     defroles.editDefaultRole(name=uvrole.name, category="default_role_unverified_id", newVal=str(uvrole.id))
     defroles.editDefaultRole(name=vrole.name, category="default_role_verified_id", newVal=str(vrole.id))
     cmdcenter.position = 0
+    
+    welcome = await guild.create_category(name="Welcome", overwrites={
+      guild.default_role: PermissionOverwrite(read_message=False)
+    })
+    welcome_channel = await welcome.create_text_channel(name="verify")
+    await welcome.set_permissions(target=uvrole, read_messages=True, send_messages=False, add_reactions=False)
+    
+    welcome_embed = Embed(title=f"Welcome to {guild.name}")
+    
+    welcome_channel.send()
+
+    
+    # Set up view button that sends a another view into the command center for entry approval.
+    
     
     init = Initialize(cmdcenter)
     await init.setup()
@@ -94,7 +119,7 @@ class SystemBot(commands.Bot):
 
   async def on_member_join(self, member: discord.Member):
     defroles = GuildRoles(guild=member.guild)
-    role = discord.utils.get(member.guild.roles, name=defroles.getGuildRoles()["properties"]["default_role_unverified_id"])
+    role = discord.utils.get(member.guild.roles, name=defroles.getGuildProperties()["default_role_unverified_name"])
     await member.add_roles(role)
     
     

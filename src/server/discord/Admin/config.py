@@ -20,7 +20,7 @@ class Config(commands.GroupCog):
 
         
         embed = Embed(title="Admin Configuration", colour=Colour.from_str(serverconf.__getsystemconfig__()["embed_color"]))
-        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1119107150812299424/1123340825947013281/Screen_Shot_2023-06-27_at_3.55.07_PM.png")
+        embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1118363465103458366/1123752160295927859/Screen_Shot_2023-06-27_at_3.55-PhotoRoom.png")
                 
         embed.add_field(name="Command Category", value=serverconf.__getadminconfig__()["cmd_category_name"], inline=True)
         embed.add_field(name="Command Text Channel", value=serverconf.__getadminconfig__()["server_command_name"], inline=True)

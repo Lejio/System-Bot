@@ -16,15 +16,15 @@ class Initialize:
         
         cmd_channel = await self.__createTextChannel(self.category, servconf["server_command_name"])
         cmd_channel_embed = Embed(title="Welcome to the Family!", description="I, Sys bot, thank you on behalf of @lejio, my creator choosing me to be your guild moderation bot!")
-        cmd_channel.send(embed=cmd_channel_embed)
+        await cmd_channel.send(embed=cmd_channel_embed)
         
         news_channel = await self.__createTextChannel(self.category, servconf["server_bot_news"])
         news_channel_embed = Embed(title="Future Updates", description="This channel would send updates to inform you of any maintenance, and any up and coming updates!")
-        news_channel.send(embed=news_channel_embed)
+        await news_channel.send(embed=news_channel_embed)
         
         admin_channel = await self.__createTextChannel(self.category, servconf["server_admin_channel"])
         admin_channel_embed = Embed(title="Command Center", description="This is where you can freely use commands without alerting your fellow members! Feel free to send me orders from here!")
-        admin_channel.send(embed=admin_channel_embed)
+        await admin_channel.send(embed=admin_channel_embed)
         
         await self.__createVoiceChannel(self.category, servconf["server_admin_vc"])
     

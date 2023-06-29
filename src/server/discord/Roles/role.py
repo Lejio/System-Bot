@@ -1,4 +1,4 @@
-from discord import Guild, ButtonStyle, Interaction, app_commands, Colour, utils, Embed, PermissionOverwrite
+from discord import Guild, ButtonStyle, Interaction, app_commands, Colour, utils, Embed, PermissionOverwrite, CategoryChannel
 from discord.ext import commands
 from discord.interactions import Interaction
 from discord.ui import Button, View
@@ -102,7 +102,8 @@ class Role(commands.Cog):
         embed = Embed(title="Choose your roles!")
         embed.description = embedBody
         
-        channel = await self.createRoleTextChannel(interaction.guild)
+        cat = await interaction.guild.create_category(name="General")
+        channel = await self.createRoleTextChannel(interaction.guild, category=cat)
         
         # Sends view as interaction.
         await channel.send(view=roleView, embed=embed)
@@ -116,8 +117,20 @@ class Role(commands.Cog):
             guild (Guild): Interaction guild.
             guildRoles (GuildRoles): Guild json connector.
         """
-        for r in guildRoles.getGuildRoles():
-            await guild.create_role(name=r, colour=Colour.from_str(guildRoles.getGuildRoles()[r]["colour"]), reason="SYS INITIAL ROLE")
+        
+        guildroles = guildRoles.getGuildRoles()
+        
+        for r in guildroles:
+            role = await guild.create_role(name=r, colour=Colour.from_str(guildRoles.getGuildRoles()[r]["colour"]), reason="SYS INITIAL ROLE")
+            overwrite = {
+                guild.default_role: PermissionOverwrite(read_messages=False),
+                guild.me: PermissionOverwrite(read_messages=True)
+            }
+            category = await guild.create_category(name=r, reason="INIT GAMING CHANNEL", overwrites=overwrite)
+            await category.set_permissions(target=role, read_messages=True, send_messages=True)
+            await category.create_text_channel(name=r)
+            await category.create_voice_channel(name=f"{r} Lounge")
+            
         
         for r in guildRoles.getGuildRoles():          
             role_id = str(utils.get(guild.roles, name=r).id)
@@ -126,7 +139,7 @@ class Role(commands.Cog):
             guildRoles.editRole(name=r, category="custom_id", newVal=str(guild.id) + str(role_id))
     
     
-    async def createRoleTextChannel(self, guild: Guild):
+    async def createRoleTextChannel(self, guild: Guild, category: CategoryChannel):
         
         # To delete the role channel, I have to keep track of the channel ID, pref in a json.
         
@@ -135,7 +148,7 @@ class Role(commands.Cog):
         guild.me: PermissionOverwrite(read_messages=True)
         }
 
-        return await guild.create_text_channel(name='choose-your-role', overwrites=overwrites)
+        return await category.create_text_channel(name='choose-your-role', overwrites=overwrites)
         
     
     @app_commands.command(name="remove-all-roles", description="REMOVES ALL ROLES SYSTEM BOT RELATED ROLES")
@@ -152,6 +165,7 @@ class Role(commands.Cog):
         
         roles = interaction.guild.roles
         guildrole = GuildRoles(interaction.guild)
+        
                 
         for r in roles:
             
@@ -159,26 +173,42 @@ class Role(commands.Cog):
                 try:
                     if (r.id == int(guildrole.getGuildRoles()[r.name]['role_id'])):
                         await r.delete()
+
                 except KeyError:
-                    pass
+                    if (r.id == int(guildrole.getGuildProperties()["default_role_unverified_id"])) or (r.id == int(guildrole.getGuildProperties()["default_role_verified_id"])):
+                        await r.delete()
+                    
             
             
     @app_commands.command(name="remove-system", description="REMOVES ALL ROLES")
     @app_commands.default_permissions(administrator=True)
     async def forceremove(self, interaction: Interaction):
         await self.removeRoles(interaction)
-        
+        guildrole = GuildRoles(interaction.guild)
         guild = interaction.guild
         servconf = ServerConfig(guild=guild)
         
         roleChannel = utils.get(guild.channels, name="choose-your-role")
         
+        for cat in guild.categories:
+            if cat.name in [r for r in guildrole.getGuildRoles()]:
+                for chan in cat.channels:
+                    await chan.delete()
+                await cat.delete()
+        
         cmdGroup = utils.get(guild.categories, name=servconf.__getadminconfig__()["cmd_category_name"])
         
-        for txtchannel in cmdGroup.channels:
-            await txtchannel.delete()
+        try:
+            for txtchannel in cmdGroup.channels:
+                await txtchannel.delete()
+        except AttributeError:
+            await interaction.channel.send("Command Center Already Removed")
         
-        await cmdGroup.delete()
+        
+        try:
+            await cmdGroup.delete()
+        except AttributeError:
+            pass
         
            # if the channel exists
         if roleChannel is not None:

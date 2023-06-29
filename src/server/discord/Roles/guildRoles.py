@@ -144,6 +144,11 @@ class GuildRoles:
         return self.__guildroles["roles"]
     
     
+    def getGuildProperties(self) -> dict:
+        
+        return self.__guildroles["properties"]
+    
+    
     def removeAllRoles(self) -> None:
         
         self.__changestatus__()
