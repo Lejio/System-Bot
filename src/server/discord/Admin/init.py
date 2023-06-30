@@ -9,10 +9,12 @@ class Initialize:
         self.category = category
 
         
-    async def setup(self):
+    async def setups(self):
         
         servconf = ServerConfig(self.category.guild)
         servconf = servconf.__getadminconfig__()
+        
+        verify_channel = await self.__createTextChannel(self.category, "verification-requests")
         
         cmd_channel = await self.__createTextChannel(self.category, servconf["server_command_name"])
         cmd_channel_embed = Embed(title="Welcome to the Family!", description="I, Sys bot, thank you on behalf of @lejio, my creator choosing me to be your guild moderation bot!")

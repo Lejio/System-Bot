@@ -31,6 +31,7 @@ from dotenv import load_dotenv
 from Roles.connector import GuildDatabase
 from Roles.guildroles import GuildRoles
 from Admin.init import Initialize
+from Admin.verify import VerifyView
 
 client = commands.Bot(command_prefix="!sys ", intents=discord.Intents.all())
 cogs: list = ["Roles.role", "Admin.admin", "Admin.config"]
@@ -76,7 +77,7 @@ class SystemBot(commands.Bot):
             
     
   async def on_guild_join(self, guild: discord.Guild):
-    
+    print("Joined")
     GuildDatabase(guild=guild)
     defroles = GuildRoles(guild=guild)
     
@@ -100,21 +101,23 @@ class SystemBot(commands.Bot):
     defroles.editDefaultRole(name=vrole.name, category="default_role_verified_id", newVal=str(vrole.id))
     cmdcenter.position = 0
     
+    # Set up view button that sends a another view into the command center for entry approval.
+    
+    init = Initialize(cmdcenter)
+    
     welcome = await guild.create_category(name="Welcome", overwrites={
-      guild.default_role: PermissionOverwrite(read_message=False)
+      guild.default_role: PermissionOverwrite(read_messages=False)
     })
     welcome_channel = await welcome.create_text_channel(name="verify")
     await welcome.set_permissions(target=uvrole, read_messages=True, send_messages=False, add_reactions=False)
     
     welcome_embed = Embed(title=f"Welcome to {guild.name}")
+    
+    # Add ID to make this view persistent.
+    vv = VerifyView(guild=guild)
+    await welcome_channel.send(embed=welcome_embed, view=vv)
     # welcome_channel.send()
-
-    
-    # Set up view button that sends a another view into the command center for entry approval.
-    
-    
-    init = Initialize(cmdcenter)
-    await init.setup()
+    await init.setups()
     
 
   async def on_member_join(self, member: discord.Member):
@@ -155,6 +158,14 @@ async def checkRoles(interaction: discord.Interaction, member: discord.Member):
   
   print(roles)
   await interaction.response.send_message(roles)
+
+@client.tree.command(name="sendcheck", description="Sending message into different channel")
+async def sendCheck(interaction: discord.Interaction):
+  
+  verify_channel = discord.utils.get(interaction.guild.channels, name="verification-requests")
+  
+  await verify_channel.send("Hello")
+  # await interaction.response.send_message("Sent")
   
 
 @client.command("isowner?")

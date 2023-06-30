@@ -8,6 +8,7 @@ from discord.enums import ButtonStyle
 from Roles.connector import GuildDatabase
 from Roles.guildroles import GuildRoles
 from Admin.serverconfig import ServerConfig
+from Admin.verify import VerifyView
     
 
 class RoleButton(Button):
@@ -230,3 +231,4 @@ async def setup(bot: commands.Bot):
         gr = GuildRoles(g)
         if gr.__status__():
             bot.add_view(RoleView(g))
+            # bot.add_view(VerifyView(g))
