@@ -96,7 +96,7 @@ class Role(commands.Cog):
         roles = roleView.getRoles()
             
         embedBody = ""
-        
+         
         for r in roles:
             embedBody += f"{roles[r]['emoji_id']} - {r}\n"
             
@@ -104,6 +104,7 @@ class Role(commands.Cog):
         embed.description = embedBody
         
         cat = await interaction.guild.create_category(name="General")
+        cat.position = 0
         channel = await self.createRoleTextChannel(interaction.guild, category=cat)
         
         # Sends view as interaction.
@@ -189,7 +190,12 @@ class Role(commands.Cog):
         guild = interaction.guild
         servconf = ServerConfig(guild=guild)
         
+        await interaction.response.send_message("Removal of System from server. Note that it would take about 30 seconds for this to go into effect.")
+        
         roleChannel = utils.get(guild.channels, name="choose-your-role")
+        general = utils.get(guild.categories, name="General")
+       
+        welcomeChannel = utils.get(guild.categories, name="Welcome")
         
         for cat in guild.categories:
             if cat.name in [r for r in guildrole.getGuildRoles()]:
@@ -211,6 +217,18 @@ class Role(commands.Cog):
         except AttributeError:
             pass
         
+        try:
+            for channel in welcomeChannel.channels:
+                await channel.delete()
+        except AttributeError:
+            pass
+        
+        try:
+            await welcomeChannel.delete()
+            await general.delete()
+        except AttributeError:
+            pass
+        
            # if the channel exists
         if roleChannel is not None:
             await roleChannel.delete()
@@ -219,6 +237,8 @@ class Role(commands.Cog):
         # if the channel does not exist, inform the user
         else:
             await interaction.response.send_message(f'No channel named, choose-your-role, was found')
+        
+
 
 
 async def setup(bot: commands.Bot):
@@ -231,4 +251,4 @@ async def setup(bot: commands.Bot):
         gr = GuildRoles(g)
         if gr.__status__():
             bot.add_view(RoleView(g))
-            # bot.add_view(VerifyView(g))
+            bot.add_view(VerifyView(g))

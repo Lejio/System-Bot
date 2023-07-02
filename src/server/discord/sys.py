@@ -81,22 +81,25 @@ class SystemBot(commands.Bot):
     GuildDatabase(guild=guild)
     defroles = GuildRoles(guild=guild)
     
-    uvrole = await guild.create_role(name="Archive")
+    uvrole = await guild.create_role(name=defroles.getGuildProperties()["default_role_unverified_name"])
+    vrole = await guild.create_role(name=defroles.getGuildProperties()["default_role_verified_name"])
     
+        
     for cat in guild.categories:
+      print(cat.name)
       await cat.edit(overwrites={
         guild.default_role: PermissionOverwrite(read_messages=False)
       })
       for chan in cat.channels:
         await chan.edit(sync_permissions=True)
+      await cat.set_permissions(vrole, read_messages=True)
+
     
     cmdcenter = await guild.create_category(name="System Command Center", overwrites={
-      guild.default_role: PermissionOverwrite(read_messages=False)}, position=0)
+      guild.default_role: PermissionOverwrite(read_messages=False)})
     
     
-    uvrole = await guild.create_role(name=defroles.getGuildProperties()["default_role_unverified_name"])
-    vrole = await guild.create_role(name=defroles.getGuildProperties()["default_role_verified_name"])
-    
+
     defroles.editDefaultRole(name=uvrole.name, category="default_role_unverified_id", newVal=str(uvrole.id))
     defroles.editDefaultRole(name=vrole.name, category="default_role_verified_id", newVal=str(vrole.id))
     cmdcenter.position = 0
@@ -108,6 +111,7 @@ class SystemBot(commands.Bot):
     welcome = await guild.create_category(name="Welcome", overwrites={
       guild.default_role: PermissionOverwrite(read_messages=False)
     })
+    await welcome.set_permissions(target=uvrole, read_messages=False)
     welcome_channel = await welcome.create_text_channel(name="verify")
     await welcome.set_permissions(target=uvrole, read_messages=True, send_messages=False, add_reactions=False)
     
