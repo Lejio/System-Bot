@@ -14,10 +14,10 @@ class Initialize:
         servconf = ServerConfig(self.category.guild)
         servconf = servconf.__getadminconfig__()
         
-        verify_channel = await self.__createTextChannel(self.category, "verification-requests")
+        await self.__createTextChannel(self.category, "verification-requests")
         
         cmd_channel = await self.__createTextChannel(self.category, servconf["server_command_name"])
-        cmd_channel_embed = Embed(title="Welcome to the Family!", description="I, Sys bot, thank you on behalf of @lejio, my creator choosing me to be your guild moderation bot!")
+        cmd_channel_embed = Embed(title=f"Greetings people of {self.category.guild.name}!", description="Thank you for choosing System bot to be the solution for all of your moderation needs! Here are some quick steps to get the bot setup.")
         await cmd_channel.send(embed=cmd_channel_embed)
         
         news_channel = await self.__createTextChannel(self.category, servconf["server_bot_news"])

@@ -84,7 +84,7 @@ class Role(commands.Cog):
         Args:
             interaction (discord.Interaction): Discord interaction object. Any "interaction" with commands are discord interactions.
         """
-
+        await interaction.response.send_message("Creating new channels. Note that it would take a couple of seconds.")
         # Creates a Discord View object.
         guildroles = GuildRoles(interaction.guild)
         
@@ -94,7 +94,7 @@ class Role(commands.Cog):
         
         roleView = RoleView(interaction.guild)
         roles = roleView.getRoles()
-            
+        vrole = utils.get(interaction.guild.roles, name="Verified")
         embedBody = ""
          
         for r in roles:
@@ -103,13 +103,15 @@ class Role(commands.Cog):
         embed = Embed(title="Choose your roles!")
         embed.description = embedBody
         
-        cat = await interaction.guild.create_category(name="General")
+        cat = await interaction.guild.create_category(name="General", overwrites={
+            interaction.guild.default_role: PermissionOverwrite(read_messages=False)
+            })
         cat.position = 0
+        await cat.set_permissions(vrole, read_messages=True, manage_emojis=False, create_public_threads=False, create_private_threads=False, add_reactions=False)
         channel = await self.createRoleTextChannel(interaction.guild, category=cat)
-        
+        await channel.edit(sync_permissions=True)
         # Sends view as interaction.
         await channel.send(view=roleView, embed=embed)
-        await interaction.response.send_message("Created new roles channel.")
     
     
     async def initRoles(self, guild: Guild, guildRoles: GuildRoles):
@@ -149,7 +151,6 @@ class Role(commands.Cog):
         guild.default_role: PermissionOverwrite(read_messages=True, send_messages=False, add_reactions=False, use_application_commands=False, mention_everyone=False),
         guild.me: PermissionOverwrite(read_messages=True)
         }
-
         return await category.create_text_channel(name='choose-your-role', overwrites=overwrites)
         
     
@@ -184,18 +185,23 @@ class Role(commands.Cog):
             
     @app_commands.command(name="remove-system", description="REMOVES ALL ROLES")
     @app_commands.default_permissions(administrator=True)
-    async def forceremove(self, interaction: Interaction):
+    async def removesystem(self, interaction: Interaction):
+        await interaction.response.send_message("Removal of System from server. Note that it would take about 30 seconds for this to go into effect.")
         await self.removeRoles(interaction)
         guildrole = GuildRoles(interaction.guild)
         guild = interaction.guild
         servconf = ServerConfig(guild=guild)
         
-        await interaction.response.send_message("Removal of System from server. Note that it would take about 30 seconds for this to go into effect.")
-        
         roleChannel = utils.get(guild.channels, name="choose-your-role")
         general = utils.get(guild.categories, name="General")
-       
         welcomeChannel = utils.get(guild.categories, name="Welcome")
+        
+        vrole = utils.get(guild.roles, name="Verified")
+        uvrole = utils.get(guild.roles, name="Unverified")
+        
+        if vrole is not None and uvrole is not None:
+            await vrole.delete()
+            await uvrole.delete()
         
         for cat in guild.categories:
             if cat.name in [r for r in guildrole.getGuildRoles()]:
@@ -205,38 +211,27 @@ class Role(commands.Cog):
         
         cmdGroup = utils.get(guild.categories, name=servconf.__getadminconfig__()["cmd_category_name"])
         
-        try:
+        if cmdGroup is not None:
             for txtchannel in cmdGroup.channels:
                 await txtchannel.delete()
-        except AttributeError:
-            await interaction.channel.send("Command Center Already Removed")
         
-        
-        try:
             await cmdGroup.delete()
-        except AttributeError:
-            pass
         
-        try:
+        
+        if welcomeChannel is not None:
             for channel in welcomeChannel.channels:
                 await channel.delete()
-        except AttributeError:
-            pass
         
-        try:
             await welcomeChannel.delete()
+        
+        if general is not None:
             await general.delete()
-        except AttributeError:
-            pass
         
            # if the channel exists
         if roleChannel is not None:
             await roleChannel.delete()
-            await interaction.response.send_message("Complete removal of System from server completed.")
 
-        # if the channel does not exist, inform the user
-        else:
-            await interaction.response.send_message(f'No channel named, choose-your-role, was found')
+      
         
 
 

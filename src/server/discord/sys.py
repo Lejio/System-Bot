@@ -115,7 +115,7 @@ class SystemBot(commands.Bot):
     welcome_channel = await welcome.create_text_channel(name="verify")
     await welcome.set_permissions(target=uvrole, read_messages=True, send_messages=False, add_reactions=False)
     
-    welcome_embed = Embed(title=f"Welcome to {guild.name}")
+    welcome_embed = Embed(title=f"Welcome to {guild.name}", description=f"Hello stranger! In order to gain access to our wonderful server, please click on the verify button down below. To speed up the process please inform the inviter to grant you access. Thank you, and I once again welcome you to {guild.name}")
     
     # Add ID to make this view persistent.
     vv = VerifyView(guild=guild)
